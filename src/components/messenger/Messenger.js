@@ -128,7 +128,8 @@ const Messenger = ({ socketMes }) => {
   // console.log("currentChatClick", currentChatClick);
 
   useEffect(() => {
-    socket.current = io("ws://localhost:8900");
+//     socket.current = io("ws://localhost:8900");
+    socket.current = io("https://endsocketne1.onrender.com");
     socket.current.on("getMessages", (data) => {
       setArrivalMessages({
         sender: data.senderId,

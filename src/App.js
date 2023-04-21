@@ -43,7 +43,8 @@ function App() {
   const [user, setUser] = useState([]);
   const { user: currentUser } = useAuth();
   React.useEffect(() => {
-    setSocket(io("ws://localhost:8900"));
+//     setSocket(io("ws://localhost:8900"));
+    setSocket(io("https://endsocketne1.onrender.com"));
   }, []);
   useEffect(() => {
     socket?.emit("addNewUser01", user.username);

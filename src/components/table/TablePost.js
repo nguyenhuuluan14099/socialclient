@@ -24,7 +24,7 @@ const TablePost = ({ currentItems }) => {
   // console.log("idPost", idPost);
   const handleDeletePost = async () => {
     try {
-      await axios.delete(`http://localhost:5000/posts/${idPost}`);
+      await axios.delete(`https://serversocial.vercel.app/posts/${idPost}`);
       toast.success("You have been deleted post");
       dispatch(setIsReload(!isReload));
     } catch (error) {

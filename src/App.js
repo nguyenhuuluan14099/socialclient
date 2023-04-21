@@ -2,6 +2,7 @@ import axios from "axios";
 import { AuthProvider, useAuth } from "components/context/Auth-Context";
 import "react-toastify/dist/ReactToastify.css";
 import React, { Suspense, useState } from "react";
+
 import { useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
@@ -54,7 +55,7 @@ function App() {
     async function getUser() {
       try {
         const userBig = await axios.get(
-          `http://localhost:5000/users?userId=${currentUser?._id}`
+          `https://serversocial.vercel.app/users?userId=${currentUser?._id}`
         );
         setUser(userBig.data);
       } catch (error) {

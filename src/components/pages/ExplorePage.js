@@ -25,7 +25,7 @@ const ExplorePage = ({ socket }) => {
       try {
         dispatch(setShowLoading(true));
         const res = await axios.get(
-          `http://localhost:5000/users/suggest/${user._id}`
+          `https://serversocial.vercel.app/users/suggest/${user._id}`
         );
         setSuggestUser(res.data);
         dispatch(setShowLoading(false));

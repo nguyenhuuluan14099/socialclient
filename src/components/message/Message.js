@@ -16,7 +16,7 @@ const Message = ({ own = false, message, yourFriend, myUser }) => {
   const dispatch = useDispatch();
   const handleDeleteMessage = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/messages/${id}`);
+      await axios.delete(`https://serversocial.vercel.app/messages/${id}`);
       dispatch(setReloadMes(!reloadMes));
     } catch (error) {
       console.log(error);

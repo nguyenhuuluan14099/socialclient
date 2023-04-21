@@ -67,7 +67,7 @@ const ProfileLayout = ({ socket }) => {
     async function getUserInfo() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users?username=${slug}`
+          `https://serversocial.vercel.app/users?username=${slug}`
         );
         setUser(res.data);
       } catch (error) {
@@ -81,7 +81,7 @@ const ProfileLayout = ({ socket }) => {
     async function getUser() {
       try {
         const userBig = await axios.get(
-          `http://localhost:5000/users?userId=${currentUser._id}`
+          `https://serversocial.vercel.app/users?userId=${currentUser._id}`
         );
         setMyUser(userBig.data);
       } catch (error) {
@@ -96,7 +96,7 @@ const ProfileLayout = ({ socket }) => {
       try {
         dispatch01(setShowLoading(true));
         const res = await axios.get(
-          "http://localhost:5000/posts/profile/" + slug
+          "https://serversocial.vercel.app/posts/profile/" + slug
         );
         dispatch01(setShowLoading(false));
 
@@ -115,9 +115,12 @@ const ProfileLayout = ({ socket }) => {
   const handleFollow = async (type) => {
     try {
       dispatch01(setShowLoading(true));
-      await axios.put(`http://localhost:5000/users/${user?._id}/follow`, {
-        userId: currentUser?._id,
-      });
+      await axios.put(
+        `https://serversocial.vercel.app/users/${user?._id}/follow`,
+        {
+          userId: currentUser?._id,
+        }
+      );
       dispatch01(setShowLoading(false));
 
       dispatch({ type: "FOLLOW", payload: user?._id });
@@ -136,7 +139,10 @@ const ProfileLayout = ({ socket }) => {
     if (user.username === myUser.username) return;
     socket?.emit("sendNotification", dataNots);
     try {
-      await axios.post("http://localhost:5000/notifications/", dataNots);
+      await axios.post(
+        "https://serversocial.vercel.app/notifications/",
+        dataNots
+      );
     } catch (error) {
       console.log(error);
     }
@@ -144,9 +150,12 @@ const ProfileLayout = ({ socket }) => {
 
   const handleUnFollow = async () => {
     try {
-      await axios.put(`http://localhost:5000/users/${user?._id}/unfollow`, {
-        userId: currentUser?._id,
-      });
+      await axios.put(
+        `https://serversocial.vercel.app/users/${user?._id}/unfollow`,
+        {
+          userId: currentUser?._id,
+        }
+      );
       dispatch({ type: "UNFOLLOW", payload: user?._id });
       setFollowed(!followed);
     } catch (error) {
@@ -156,10 +165,13 @@ const ProfileLayout = ({ socket }) => {
 
   const handleCreateConversation = async () => {
     try {
-      await axios.post(`http://localhost:5000/conversations/${myUser._id}`, {
-        senderId: myUser?._id,
-        receiveId: user._id,
-      });
+      await axios.post(
+        `https://serversocial.vercel.app/conversations/${myUser._id}`,
+        {
+          senderId: myUser?._id,
+          receiveId: user._id,
+        }
+      );
       console.log("create new conversation");
     } catch (error) {
       console.log(error);

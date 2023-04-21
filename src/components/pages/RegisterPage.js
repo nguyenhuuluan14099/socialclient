@@ -57,7 +57,7 @@ const RegisterPage = () => {
       relationship: 1,
     };
     try {
-      await axios.post("http://localhost:5000/users/register", user);
+      await axios.post("https://serversocial.vercel.app/users/register", user);
       toast.success("create account successfully!");
       reset({
         username: "",

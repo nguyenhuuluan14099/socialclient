@@ -14,7 +14,7 @@ const UserStore = ({ friendOnline }) => {
     const getFriend = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users/friend/${user?._id}`
+          `https://serversocial.vercel.app/users/friend/${user?._id}`
         );
         setFriend(res.data);
       } catch (error) {

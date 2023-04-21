@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 const globalSlice = createSlice({
   name: "global",
   initialState: {
-    darkMode: false,
+    darkMode: true,
     sideBar: false,
     isUpdate: false,
     isComment: false,

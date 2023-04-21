@@ -69,7 +69,7 @@ const Messenger = ({ socketMes }) => {
     async function getUser() {
       try {
         const userBig = await axios.get(
-          `http://localhost:5000/users?userId=${user._id}`
+          `https://serversocial.vercel.app/users?userId=${user._id}`
         );
         setMyUser(userBig.data);
       } catch (error) {
@@ -95,7 +95,7 @@ const Messenger = ({ socketMes }) => {
     const getFriend = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users/friend/${user._id}`
+          `https://serversocial.vercel.app/users/friend/${user._id}`
         );
         setFriend(res.data);
       } catch (error) {
@@ -115,7 +115,7 @@ const Messenger = ({ socketMes }) => {
     async function getCons() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/conversations/find/${user?._id}/${slugId}`
+          `https://serversocial.vercel.app/conversations/find/${user?._id}/${slugId}`
         );
         setCurrentChatClick(res.data);
       } catch (error) {
@@ -167,7 +167,7 @@ const Messenger = ({ socketMes }) => {
         // dispatch(setShowLoading(true));
 
         const res = await axios.get(
-          "http://localhost:5000/conversations/" + user._id
+          "https://serversocial.vercel.app/conversations/" + user._id
         );
         // dispatch(setShowLoading(false));
 
@@ -198,7 +198,7 @@ const Messenger = ({ socketMes }) => {
     async function getFriend() {
       try {
         const res = await axios(
-          "http://localhost:5000/users?userId=" + friendId
+          "https://serversocial.vercel.app/users?userId=" + friendId
         );
         setFriendCurrent(res.data);
       } catch (error) {
@@ -228,7 +228,7 @@ const Messenger = ({ socketMes }) => {
         dispatch(setShowLoading(true));
 
         const res = await axios.get(
-          `http://localhost:5000/messages/${currentChat?._id}`
+          `https://serversocial.vercel.app/messages/${currentChat?._id}`
         );
         dispatch(setShowLoading(false));
 
@@ -267,7 +267,7 @@ const Messenger = ({ socketMes }) => {
 
     try {
       // dispatch(setShowLoading(true));
-      const res = await axios.post("http://localhost:5000/messages/", message);
+      const res = await axios.post("https://serversocial.vercel.app/messages/", message);
       // dispatch(setShowLoading(false));
 
       setMessages([...messages, res.data]);
@@ -291,7 +291,7 @@ const Messenger = ({ socketMes }) => {
     };
     socketMes?.emit("sendNotification", dataNots);
     try {
-      await axios.post("http://localhost:5000/notifications/", dataNots);
+      await axios.post("https://serversocial.vercel.app/notifications/", dataNots);
       // dispatch(setReloadMes(!reloadMes));
       setReviewImage({});
       setMedia([]);

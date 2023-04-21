@@ -14,7 +14,7 @@ const SuggestPage = () => {
     async function getSuggestList() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users/suggest/${user?._id}`
+          `https://serversocial.vercel.app/users/suggest/${user?._id}`
         );
         setSuggestUser(res.data.filter((user) => user.username));
       } catch (error) {

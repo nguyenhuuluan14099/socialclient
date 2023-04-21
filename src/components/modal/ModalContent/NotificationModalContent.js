@@ -25,7 +25,7 @@ const NotificationModalContent = ({
   const handleMarkAllRead = async () => {
     try {
       await axios.delete(
-        `http://localhost:5000/notifications/${user.username}`
+        `https://serversocial.vercel.app/notifications/${user.username}`
       );
       dispatch(setMarkNot(!markNot));
       setNotifications([]);

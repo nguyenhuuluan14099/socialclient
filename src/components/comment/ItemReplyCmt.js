@@ -36,9 +36,12 @@ const ItemReplyCmt = ({
 
   const handleClickReplyCmt = async (type, cmtId) => {
     try {
-      await axios.put(`http://localhost:5000/comments/${cmtId}/like`, {
-        userId: user._id,
-      });
+      await axios.put(
+        `https://serversocial.vercel.app/comments/${cmtId}/like`,
+        {
+          userId: user._id,
+        }
+      );
     } catch (error) {
       console.log(error);
     }
@@ -72,7 +75,10 @@ const ItemReplyCmt = ({
       return;
     socket?.emit("sendNotification", dataNots);
     try {
-      await axios.post("http://localhost:5000/notifications/", dataNots);
+      await axios.post(
+        "https://serversocial.vercel.app/notifications/",
+        dataNots
+      );
     } catch (error) {
       console.log(error);
     }

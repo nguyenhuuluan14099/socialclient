@@ -25,7 +25,7 @@ const ProfilePosts = ({ socket }) => {
       try {
         dispatch01(setShowLoading(true));
         const res = await axios.get(
-          "http://localhost:5000/posts/profile/" + slug
+          "https://serversocial.vercel.app/posts/profile/" + slug
         );
         dispatch01(setShowLoading(false));
         dispatch01(setIsReload(false));
@@ -43,7 +43,7 @@ const ProfilePosts = ({ socket }) => {
     async function getUser() {
       try {
         const userBig = await axios.get(
-          `http://localhost:5000/users?userId=${currentUser._id}`
+          `https://serversocial.vercel.app/users?userId=${currentUser._id}`
         );
         setMyUser(userBig.data);
       } catch (error) {

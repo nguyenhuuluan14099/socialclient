@@ -42,7 +42,7 @@ const HomeLayOut = ({ socket }) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await axios.get(`http://localhost:5000/users/${user?._id}`);
+        const res = await axios.get(`https://serversocial.vercel.app/users/${user?._id}`);
         setCurrentUser(res.data);
       } catch (error) {
         console.log(error);
@@ -81,7 +81,7 @@ const HomeLayOut = ({ socket }) => {
     async function getNots() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/notifications/${currentUser?.username}`
+          `https://serversocial.vercel.app/notifications/${currentUser?.username}`
         );
 
         setNotifications(res.data.reverse());

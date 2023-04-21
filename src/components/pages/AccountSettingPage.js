@@ -57,7 +57,9 @@ const AccountSettingPage = ({ socket }) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await axios.get(`http://localhost:5000/users/${user._id}`);
+        const res = await axios.get(
+          `https://serversocial.vercel.app/users/${user._id}`
+        );
         setCurrentUser(res.data);
       } catch (error) {
         console.log(error);
@@ -87,7 +89,7 @@ const AccountSettingPage = ({ socket }) => {
       currentPassword: values?.currentPassword,
     };
     try {
-      await axios.put(`http://localhost:5000/users/`, data);
+      await axios.put(`https://serversocial.vercel.app/users/`, data);
       toast.success("updated user successfully");
       window.location.reload();
     } catch (error) {

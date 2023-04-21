@@ -45,9 +45,12 @@ const Post = ({ post, socket }) => {
   // console.log("post", post);
   const handleClickLike = async (type) => {
     try {
-      await axios.put("http://localhost:5000/posts/" + post._id + "/like/", {
-        userId: currentUser._id,
-      });
+      await axios.put(
+        "https://serversocial.vercel.app/posts/" + post._id + "/like/",
+        {
+          userId: currentUser._id,
+        }
+      );
 
       play();
     } catch (error) {
@@ -69,7 +72,10 @@ const Post = ({ post, socket }) => {
     if (user?.username === myUser.username) return;
     socket?.emit("sendNotification", dataNots);
     try {
-      await axios.post("http://localhost:5000/notifications/", dataNots);
+      await axios.post(
+        "https://serversocial.vercel.app/notifications/",
+        dataNots
+      );
     } catch (error) {
       console.log(error);
     }
@@ -80,12 +86,12 @@ const Post = ({ post, socket }) => {
     async function getUser() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users?userId=${post.userId}`
+          `https://serversocial.vercel.app/users?userId=${post.userId}`
         );
         setUser(res.data);
 
         const userBig = await axios.get(
-          `http://localhost:5000/users?userId=${currentUser._id}`
+          `https://serversocial.vercel.app/users?userId=${currentUser._id}`
         );
         setMyUser(userBig.data);
       } catch (error) {
@@ -127,7 +133,7 @@ const Post = ({ post, socket }) => {
     async function getComments() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/comments/${post._id}`
+          `https://serversocial.vercel.app/comments/${post._id}`
         );
         setCommentList(res.data.reverse());
       } catch (error) {
@@ -146,9 +152,12 @@ const Post = ({ post, socket }) => {
   const handleSavedPost = async () => {
     setSaved(!saved);
     try {
-      await axios.put(`http://localhost:5000/posts/saved/${post._id}`, {
-        userId: myUser._id,
-      });
+      await axios.put(
+        `https://serversocial.vercel.app/posts/saved/${post._id}`,
+        {
+          userId: myUser._id,
+        }
+      );
 
       if (saved) {
         toast.info("You unsaved post");
@@ -165,7 +174,7 @@ const Post = ({ post, socket }) => {
     async function getUser() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users/${post?.userId}`
+          `https://serversocial.vercel.app/users/${post?.userId}`
         );
         setUserPost(res.data);
       } catch (error) {

@@ -82,7 +82,7 @@ const DetailPostModalContent = ({
     if (dataPostProfile) return;
     async function getData() {
       try {
-        const res = await axios.get(`http://localhost:5000/posts/${slug}`);
+        const res = await axios.get(`https://serversocial.vercel.app/posts/${slug}`);
         setPost(res.data);
       } catch (error) {
         console.log(error);
@@ -91,14 +91,14 @@ const DetailPostModalContent = ({
     getData();
   }, [isLiked, slug, dataPostProfile, isUpdate]);
 
-  //"http://localhost:5000/posts/" + dataPostProfile?._id + "/like/",
-  //`http://localhost:5000/posts/${dataPostProfile?._id ? dataPostProfile?._id : post?._id}/like/`
+  //"https://serversocial.vercel.app/posts/" + dataPostProfile?._id + "/like/",
+  //`https://serversocial.vercel.app/posts/${dataPostProfile?._id ? dataPostProfile?._id : post?._id}/like/`
   //handleClick for profile Item post
 
   const handleClickLike = async (type) => {
     try {
       await axios.put(
-        `http://localhost:5000/posts/${
+        `https://serversocial.vercel.app/posts/${
           dataPostProfile?._id ? dataPostProfile?._id : post?._id
         }/like/`,
         {
@@ -139,7 +139,7 @@ const DetailPostModalContent = ({
       return;
     socket?.emit("sendNotification", dataNots);
     try {
-      await axios.post("http://localhost:5000/notifications/", dataNots);
+      await axios.post("https://serversocial.vercel.app/notifications/", dataNots);
     } catch (error) {
       console.log(error);
     }
@@ -151,7 +151,7 @@ const DetailPostModalContent = ({
     async function getUser() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users/${dataPostProfile?.userId}`
+          `https://serversocial.vercel.app/users/${dataPostProfile?.userId}`
         );
         setModalUser(res.data);
       } catch (error) {
@@ -165,7 +165,7 @@ const DetailPostModalContent = ({
     async function getUser() {
       try {
         const userBig = await axios.get(
-          `http://localhost:5000/users?userId=${currentUser?._id}`
+          `https://serversocial.vercel.app/users?userId=${currentUser?._id}`
         );
         setMyUser(userBig.data);
       } catch (error) {
@@ -179,7 +179,7 @@ const DetailPostModalContent = ({
     async function getUser() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users/${post?.userId}`
+          `https://serversocial.vercel.app/users/${post?.userId}`
         );
         setUser(res.data);
       } catch (error) {
@@ -195,7 +195,7 @@ const DetailPostModalContent = ({
         dispatch(setShowLoading(true));
 
         const res = await axios.get(
-          "http://localhost:5000/posts/profile/" + user?.username
+          "https://serversocial.vercel.app/posts/profile/" + user?.username
         );
         dispatch(setShowLoading(false));
 
@@ -217,7 +217,7 @@ const DetailPostModalContent = ({
         dispatch(setShowLoading(true));
 
         const res = await axios.get(
-          `http://localhost:5000/comments/${
+          `https://serversocial.vercel.app/comments/${
             dataPostProfile ? dataPostProfile?._id : post._id
           }`
         );
@@ -266,7 +266,7 @@ const DetailPostModalContent = ({
     setSaved(!saved);
     try {
       await axios.put(
-        `http://localhost:5000/posts/saved/${
+        `https://serversocial.vercel.app/posts/saved/${
           dataPostProfile ? dataPostProfile._id : post._id
         }`,
         {

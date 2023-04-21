@@ -8,7 +8,7 @@ export const loginCall = async (
 ) => {
   try {
     const res = await axios.post(
-      "http://localhost:5000/users/login",
+      "https://serversocial.vercel.app/users/login",
       userCurrent
     );
     dispatch({

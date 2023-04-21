@@ -12,7 +12,7 @@ const FollowingModalContent = ({ onClose = () => {}, slug }) => {
     async function getUserInfo() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users?username=${slug}`
+          `https://serversocial.vercel.app/users?username=${slug}`
         );
         setUser(res.data);
       } catch (error) {
@@ -27,7 +27,7 @@ const FollowingModalContent = ({ onClose = () => {}, slug }) => {
     async function fetchUsers() {
       try {
         const res = await axios.get(
-          "http://localhost:5000/users/friend/" + user._id
+          "https://serversocial.vercel.app/users/friend/" + user._id
         );
         setFriendFollowing(res.data);
       } catch (error) {

@@ -15,12 +15,12 @@ const ChatOnline = ({
   const [onlineFriends, setOnlineFriends] = useState([]);
   // console.log("friendsOnline", friendsOnline);
   // console.log("friend", friend);
-
+  // const { REACT_APP_SERVER_URL } = process.env;
   useEffect(() => {
     const getFriend = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users/friend/${user._id}`
+          `https://serversocial.vercel.app/users/friend/${user._id}`
         );
         setFriend(res.data);
       } catch (error) {
@@ -47,7 +47,7 @@ const ChatOnline = ({
   const handleCreateConversation = async (friendOnline) => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/conversations/find/${user._id}/${friendOnline._id}`
+        `https://serversocial.vercel.app/conversations/find/${user._id}/${friendOnline._id}`
       );
       setCurrentChat(res.data);
 

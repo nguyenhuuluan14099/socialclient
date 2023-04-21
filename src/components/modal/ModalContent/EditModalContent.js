@@ -35,7 +35,7 @@ const EditModalContent = ({
     async function getUser() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users/${currentUser._id}`
+          `https://serversocial.vercel.app/users/${currentUser._id}`
         );
         setUser(res.data);
       } catch (error) {
@@ -68,7 +68,7 @@ const EditModalContent = ({
       hideLike: values.hideLike,
     };
     try {
-      await axios.put(`http://localhost:5000/posts/${postId}`, data);
+      await axios.put(`https://serversocial.vercel.app/posts/${postId}`, data);
       toast.success("Updated post successfully!");
       hideModalEdit();
       dispatch(toggleUpdate(!isUpdate));
@@ -115,7 +115,9 @@ const EditModalContent = ({
   useEffect(() => {
     async function getPost() {
       try {
-        const res = await axios.get(`http://localhost:5000/posts/${postId}`);
+        const res = await axios.get(
+          `https://serversocial.vercel.app/posts/${postId}`
+        );
         setPost(res.data);
       } catch (error) {
         console.log(error);

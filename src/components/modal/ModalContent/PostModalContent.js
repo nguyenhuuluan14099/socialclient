@@ -44,7 +44,7 @@ const PostModalContent = ({ onClose = () => {}, ...rest }) => {
 
   const handleDeletePost = async () => {
     try {
-      await axios.delete(`http://localhost:5000/posts/${postId}`);
+      await axios.delete(`https://serversocial.vercel.app/posts/${postId}`);
       toast.success("Delete post successfully!");
       setModalValid(false);
       dispatch(setIsReload(true));

@@ -68,7 +68,7 @@ const ItemComment = ({
     async function getCmt() {
       try {
         const cmt = await axios.get(
-          `http://localhost:5000/comments/getOne/${commentId}`
+          `https://serversocial.vercel.app/comments/getOne/${commentId}`
         );
         setOneCmt(cmt.data);
       } catch (error) {
@@ -94,17 +94,18 @@ const ItemComment = ({
     // console.log("idCmt", idCmt);
 
     try {
-      await axios.delete(`http://localhost:5000/comments/${idCmt}`);
+      await axios.delete(`https://serversocial.vercel.app/comments/${idCmt}`);
       dispatch(addComment(!isComment));
     } catch (error) {
       console.log(error);
     }
   };
+
   useEffect(() => {
     async function getUser() {
       try {
         const userBig = await axios.get(
-          `http://localhost:5000/users?userId=${user._id}`
+          `https://serversocial.vercel.app/users?userId=${user._id}`
         );
         setMyUser(userBig.data);
       } catch (error) {
@@ -115,9 +116,12 @@ const ItemComment = ({
   }, [user._id]);
   const handleClickLikeCmt = async (type) => {
     try {
-      await axios.put(`http://localhost:5000/comments/${comment._id}/like`, {
-        userId: user._id,
-      });
+      await axios.put(
+        `https://serversocial.vercel.app/comments/${comment._id}/like`,
+        {
+          userId: user._id,
+        }
+      );
     } catch (error) {
       console.log(error);
     }
@@ -143,7 +147,10 @@ const ItemComment = ({
     if (comment.user.username === myUser.username) return;
     socket?.emit("sendNotification", dataNots);
     try {
-      await axios.post("http://localhost:5000/notifications/", dataNots);
+      await axios.post(
+        "https://serversocial.vercel.app/notifications/",
+        dataNots
+      );
     } catch (error) {
       console.log(error);
     }
@@ -159,7 +166,7 @@ const ItemComment = ({
     async function getUserLikeList() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/comments/${commentId}/listUser`
+          `https://serversocial.vercel.app/comments/${commentId}/listUser`
         );
         setListUserLike(res.data);
       } catch (error) {

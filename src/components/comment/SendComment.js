@@ -50,7 +50,7 @@ const SendComment = ({
     async function getUser() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users/${currentUser?._id}`
+          `https://serversocial.vercel.app/users/${currentUser?._id}`
         );
         setUser(res.data);
       } catch (error) {
@@ -91,7 +91,7 @@ const SendComment = ({
     // console.log("type", type);
     try {
       setLoading(true);
-      await axios.post("http://localhost:5000/comments/", value);
+      await axios.post("https://serversocial.vercel.app/comments/", value);
       play();
       setLoading(false);
       setContent("");
@@ -129,7 +129,10 @@ const SendComment = ({
       // console.log("dataNots", dataNots);
       socket?.emit("sendNotification", dataNots);
       try {
-        await axios.post("http://localhost:5000/notifications/", dataNots);
+        await axios.post(
+          "https://serversocial.vercel.app/notifications/",
+          dataNots
+        );
       } catch (error) {
         console.log(error);
       }

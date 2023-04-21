@@ -82,7 +82,7 @@ const ManageSystemPage = ({ socket }) => {
     async function getUser() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users/listUser/${user._id}`
+          `https://serversocial.vercel.app/users/listUser/${user._id}`
         );
         setUsers(res.data);
       } catch (error) {
@@ -95,7 +95,7 @@ const ManageSystemPage = ({ socket }) => {
     async function getPosts() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/posts/listPost/${user._id}`
+          `https://serversocial.vercel.app/posts/listPost/${user._id}`
         );
         setPosts(res.data);
       } catch (error) {

@@ -26,7 +26,7 @@ const Conversation = ({
     async function getMessage() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/messages/${conversations._id}`
+          `https://serversocial.vercel.app/messages/${conversations._id}`
         );
         setLastMess(res.data.slice(-1));
       } catch (error) {
@@ -48,7 +48,7 @@ const Conversation = ({
       const friendId = conversations.members.find((m) => m !== currentUser._id);
       try {
         const res = await axios(
-          "http://localhost:5000/users?userId=" + friendId
+          "https://serversocial.vercel.app/users?userId=" + friendId
         );
         setUser(res.data);
       } catch (error) {

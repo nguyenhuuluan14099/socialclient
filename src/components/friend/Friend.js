@@ -14,7 +14,9 @@ const Friend = () => {
     if (!user) return;
     async function getCurrentUser() {
       try {
-        const res = await axios.get(`http://localhost:5000/users/${user?._id}`);
+        const res = await axios.get(
+          `https://serversocial.vercel.app/users/${user?._id}`
+        );
         setCurrentUser(res.data);
       } catch (error) {
         console.log(error);
@@ -25,7 +27,7 @@ const Friend = () => {
     async function getSuggestList() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users/suggest/${user?._id}`
+          `https://serversocial.vercel.app/users/suggest/${user?._id}`
         );
         setSuggestUser(res.data.filter((user) => user.username));
       } catch (error) {

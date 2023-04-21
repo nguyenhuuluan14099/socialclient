@@ -76,7 +76,7 @@ const ShareModalContent = ({ onClose = () => {} }) => {
     console.log("values", post);
     // console.log("content", content);
     try {
-      await axios.post("http://localhost:5000/posts/", post);
+      await axios.post("https://serversocial.vercel.app/posts/", post);
       reset({
         desc: "",
         location: "",
@@ -111,7 +111,7 @@ const ShareModalContent = ({ onClose = () => {} }) => {
     async function getUser() {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users?userId=${currentUser._id}`
+          `https://serversocial.vercel.app/users?userId=${currentUser._id}`
         );
         setUser(res.data);
       } catch (error) {

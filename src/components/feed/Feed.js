@@ -22,7 +22,7 @@ const Feed = ({ socket }) => {
     async function getUser() {
       try {
         const userBig = await axios.get(
-          `http://localhost:5000/users?userId=${user?._id}`
+          `https://serversocial.vercel.app/users?userId=${user?._id}`
         );
         setCurrentUser(userBig.data);
       } catch (error) {
@@ -37,7 +37,7 @@ const Feed = ({ socket }) => {
         dispatch(setShowLoading(true));
 
         const res = await axios.get(
-          "http://localhost:5000/posts/timeline/" + user?._id
+          "https://serversocial.vercel.app/posts/timeline/" + user?._id
         );
         dispatch(setShowLoading(false));
 
@@ -58,7 +58,7 @@ const Feed = ({ socket }) => {
         dispatch(setShowLoading(true));
 
         const res = await axios.get(
-          `http://localhost:5000/posts/getPostUser/64243346e08ff82368262657`
+          `https://serversocial.vercel.app/posts/getPostUser/64243346e08ff82368262657`
         );
         dispatch(setShowLoading(false));
 

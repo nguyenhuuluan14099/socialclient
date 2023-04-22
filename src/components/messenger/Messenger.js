@@ -138,6 +138,9 @@ const Messenger = ({ socketMes }) => {
         createdAt: Date.now(),
       });
     });
+     return () => {
+      socket.current.disconnect();
+    };
   }, []);
   useEffect(() => {
     arrivalMessages &&
@@ -153,6 +156,9 @@ const Messenger = ({ socketMes }) => {
         user.followings.filter((u) => users.some((b) => b.userId === u))
       );
     });
+     return () => {
+      socket.current.disconnect();
+    };
   }, [user]);
 
   useEffect(() => {

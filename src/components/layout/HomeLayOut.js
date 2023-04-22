@@ -63,6 +63,9 @@ const HomeLayOut = ({ socket }) => {
 
       setSocketNot(data);
     });
+     return () => {
+      socket?.disconnect();
+    };
   }, [socket, dispatch]);
 
   useEffect(() => {

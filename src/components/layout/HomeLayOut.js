@@ -42,7 +42,9 @@ const HomeLayOut = ({ socket }) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await axios.get(`https://serversocial.vercel.app/users/${user?._id}`);
+        const res = await axios.get(
+          `https://serversocial.vercel.app/users/${user?._id}`
+        );
         setCurrentUser(res.data);
       } catch (error) {
         console.log(error);
@@ -63,6 +65,9 @@ const HomeLayOut = ({ socket }) => {
 
       setSocketNot(data);
     });
+    return () => {
+      socket?.disconnect();
+    };
   }, [socket, dispatch]);
 
   useEffect(() => {
@@ -150,7 +155,7 @@ const HomeLayOut = ({ socket }) => {
                     className="flex items-center gap-x-4 group h-[50px] "
                   >
                     {({ isActive, isPending }) => (
-                      <div className="text-slate-600 flex items-center  gap-x-3">
+                      <div className="flex items-center text-slate-600 gap-x-3">
                         <div
                           className={` ${
                             item.title === "Messages" ? " relative" : ""
@@ -184,7 +189,7 @@ const HomeLayOut = ({ socket }) => {
 
             <div className="notification hidden cursor-pointer md:flex items-center gap-x-3 group h-[40px] ">
               <div
-                className=" flex items-center gap-x-3"
+                className="flex items-center  gap-x-3"
                 onClick={handleClickNotification}
               >
                 <div
@@ -273,7 +278,7 @@ const HomeLayOut = ({ socket }) => {
             <div
               ref={moreRef}
               onClick={handleClickShow}
-              className=" flex items-center gap-x-2  cursor-pointer"
+              className="flex items-center cursor-pointer  gap-x-2"
             >
               <span>
                 <svg

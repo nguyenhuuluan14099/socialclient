@@ -128,7 +128,7 @@ const Messenger = ({ socketMes }) => {
   // console.log("currentChatClick", currentChatClick);
 
   useEffect(() => {
-    socket.current = io("ws://localhost:8900");
+    socket.current = io("https://endsocketne1.onrender.com");
     socket.current.on("getMessages", (data) => {
       setArrivalMessages({
         sender: data.senderId,
@@ -137,6 +137,9 @@ const Messenger = ({ socketMes }) => {
         createdAt: Date.now(),
       });
     });
+    return () => {
+      socket.current.disconnect();
+    };
   }, []);
   useEffect(() => {
     arrivalMessages &&
@@ -152,6 +155,9 @@ const Messenger = ({ socketMes }) => {
         user.followings.filter((u) => users.some((b) => b.userId === u))
       );
     });
+    return () => {
+      socket.current.disconnect();
+    };
   }, [user]);
 
   useEffect(() => {
@@ -267,7 +273,10 @@ const Messenger = ({ socketMes }) => {
 
     try {
       // dispatch(setShowLoading(true));
-      const res = await axios.post("https://serversocial.vercel.app/messages/", message);
+      const res = await axios.post(
+        "https://serversocial.vercel.app/messages/",
+        message
+      );
       // dispatch(setShowLoading(false));
 
       setMessages([...messages, res.data]);
@@ -291,7 +300,10 @@ const Messenger = ({ socketMes }) => {
     };
     socketMes?.emit("sendNotification", dataNots);
     try {
-      await axios.post("https://serversocial.vercel.app/notifications/", dataNots);
+      await axios.post(
+        "https://serversocial.vercel.app/notifications/",
+        dataNots
+      );
       // dispatch(setReloadMes(!reloadMes));
       setReviewImage({});
       setMedia([]);
@@ -357,7 +369,7 @@ const Messenger = ({ socketMes }) => {
               </svg>
             </span>
 
-            <div className="flex items-center gap-x-2 cursor-pointer">
+            <div className="flex items-center cursor-pointer gap-x-2">
               <span className="font-semibold ">{myUser.username}</span>{" "}
             </div>
             <div className="cursor-pointer">
@@ -427,9 +439,9 @@ const Messenger = ({ socketMes }) => {
                 className="h-[600px] w-full overflow-y-scroll relative"
               >
                 <div className="border border-transparent w-full  flex items-center justify-between border-b-slate-300 dark:border-[#262626] py-4 px-5 sticky z-10 bg-white dark:bg-black dark:text-white -top-2 left-0">
-                  <div className="flex items-center w-full justify-between ">
+                  <div className="flex items-center justify-between w-full ">
                     <Link to={`/${friendCurrent.username}`}>
-                      <div className="flex gap-x-2 items-center">
+                      <div className="flex items-center gap-x-2">
                         <img
                           src={
                             friendCurrent?.profilePicture?.thumb ||
@@ -492,7 +504,7 @@ const Messenger = ({ socketMes }) => {
                 ></textarea>
                 <div className="flex items-center gap-x-2  w-full max-w-[80px] justify-between ">
                   {reviewImage.imageMes && (
-                    <div className="imgReview relative flex-1">
+                    <div className="relative flex-1 imgReview">
                       <img
                         src={reviewImage.imageMes}
                         className="w-[35px] h-[35px] object-cover rounded-xs"
@@ -554,7 +566,7 @@ const Messenger = ({ socketMes }) => {
                   </>
                 ) : (
                   <>
-                    <p className="none-focus cursor-pointer px-2">
+                    <p className="px-2 cursor-pointer none-focus">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"

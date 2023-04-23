@@ -80,7 +80,13 @@ const RegisterPage = () => {
   }, [errors]);
 
   return (
-    <div className="w-full p-4 bg-white  min-h-[100vh] items-center flex justify-center">
+    <div
+     style={{
+        backgroundImage: `url(https://colorlib.com/etc/lf/Login_v16/images/bg-01.jpg)`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+      }}
+    className="w-full p-4 bg-white  min-h-[100vh] items-center flex justify-center">
       <div className=" w-full max-w-[500px] bg-slate-200 p-3 rounded-lg ">
         <div className="text-center flex flex-col gap-y-1 items-center">
           <img

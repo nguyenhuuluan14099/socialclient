@@ -21,7 +21,7 @@ const ProfileSaved = ({ socket }) => {
       try {
         dispatch(setShowLoading(true));
         const res = await axios.get(
-          `https://serversocial.vercel.app/posts/savedItem/${user?._id}`
+          `${process.env.REACT_APP_SERVER_URL}/posts/savedItem/${user?._id}`
         );
         dispatch(setShowLoading(false));
 

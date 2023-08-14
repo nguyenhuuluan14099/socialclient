@@ -23,6 +23,28 @@ const AuthReducer = (state, action) => {
           ),
         },
       };
+    case "TOGGLE_DARKMODE":
+      return {
+        ...state,
+        darkMode: action.payload,
+      };
+    case "UPDATE_USER":
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          username: action.username || state.user.username,
+          desc: action.desc || state.user.desc,
+          city: action.city || state.user.city,
+          profilePicture: action.profilePicture || state.user.profilePicture,
+        },
+      };
+    case "LOGOUT":
+      return {
+        ...state,
+        user: action.payload,
+      };
+
     default:
       return state;
   }

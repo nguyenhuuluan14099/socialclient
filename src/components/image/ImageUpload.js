@@ -1,13 +1,12 @@
 import axios from "axios";
 import { imgbbAPI } from "components/config/config";
 import ProgressBar from "react-customizable-progressbar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import IconPhoto from "components/icons/IconPhoto";
-import { useDispatch, useSelector } from "react-redux";
-import { setImageMessage } from "components/redux/globalSlice";
+import ImageLazy from "./ImageLazy";
 
 const ImageUpload = ({ onChange = () => {}, name = "", imageViewEdit }) => {
-  const [reviewImage, setReviewImage] = useState("");
+  const [reviewImage, setReviewImage] = useState();
   const [progress, setProgress] = useState(0);
   const handleUploadImage = async (e) => {
     const file = e.target.files;
@@ -29,7 +28,7 @@ const ImageUpload = ({ onChange = () => {}, name = "", imageViewEdit }) => {
     const imgData = response.data.data;
     setReviewImage(imgData?.url);
     if (!imgData) {
-      console.log("can not fine your image");
+      console.log("can not find your image");
     }
     const objectImg = {
       thumb: imgData.thumb.url,
@@ -40,14 +39,16 @@ const ImageUpload = ({ onChange = () => {}, name = "", imageViewEdit }) => {
   return (
     <div
       style={{
-        backgroundImage: `url(${reviewImage})}`,
-        height: "300px xl:500px",
+        // backgroundImage: `url(${reviewImage})}`,
+        // height: "300px xl:500px",
+        height: "100%",
         width: "100%",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         backgroundSize: "100% 100%",
       }}
-      className="flex items-center cursor-pointer  relative justify-center w-full max-w-[100%] max-h-full h-[300px] xl:h-[500px]"
+      //h-[300px] xl:h-[500px]
+      className="flex items-center here cursor-pointer borer border-red-500  relative justify-center w-[450px] max-w-[100%] "
     >
       <label className="w-full h-full cursor-pointer flex items-center justify-center">
         {imageViewEdit ? (
@@ -59,7 +60,7 @@ const ImageUpload = ({ onChange = () => {}, name = "", imageViewEdit }) => {
               id="image-input"
               type="file"
               onChange={handleUploadImage}
-              className="hidden"
+              hidden
             />
           </>
         )}
@@ -92,15 +93,21 @@ const ImageUpload = ({ onChange = () => {}, name = "", imageViewEdit }) => {
 
           {(reviewImage || imageViewEdit) && (
             <>
-              <div className="w-full  cursor-pointer max-w-[500px] rounded-bl-lg flex">
-                <img
+              <div className="  w-full  cursor-pointer  flex">
+                {/* <img
+                  className="object-cover h-full rounded-bl-lg w-[500px] z-9999  z-10 mx-auto   my-auto  bg-opacity-70 max-h-[300px]"
                   src={imageViewEdit || reviewImage}
                   alt=""
-                  className="object-cover h-full rounded-bl-lg w-full  z-10 mx-auto   my-auto  bg-opacity-70 max-h-[300px]"
-                />
+                /> */}
+                <ImageLazy
+                  height="100%"
+                  width="100%"
+                  className="object-cover   w-full  z-9999  z-10 mx-auto    bg-opacity-70 h-full"
+                  url={imageViewEdit || reviewImage}
+                ></ImageLazy>
               </div>
 
-              <div
+              {/* <div
                 style={{
                   backgroundImage: `url(${imageViewEdit || reviewImage})`,
                   height: "300px",
@@ -111,7 +118,7 @@ const ImageUpload = ({ onChange = () => {}, name = "", imageViewEdit }) => {
                 }}
                 className="w-full absolute  max-w-[500px] h-[300px] xl:h-[500px] max-h-[501px] rounded-bl-lg "
               ></div>
-              <div className="w-full absolute backdrop-blur-sm max-w-[500px] h-[300px] xl:h-[500px] max-h-[501px] rounded-bl-lg bg-black bg-opacity-50"></div>
+              <div className="w-full absolute backdrop-blur-sm  max-w-[500px] h-[300px] xl:h-[500px] max-h-[501px] rounded-bl-lg bg-black bg-opacity-50"></div> */}
             </>
           )}
 

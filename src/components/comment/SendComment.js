@@ -6,7 +6,6 @@ import soundSend from "components/sounds/soundSend.mp3";
 
 import {
   addComment,
-  setMarkNot,
   setReplyComment,
   toggleRemoveTag,
   toggleViewCmt,
@@ -17,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 const SendComment = ({
   post,
   dataPostProfile,
-  myUser,
+  // myUser,
   receiverName,
   socket,
   replyData = "",
@@ -33,7 +32,6 @@ const SendComment = ({
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState([]);
   const textRef = useRef();
-  const [textHeight, setTextHeight] = useState("");
   const { user: currentUser } = useAuth();
   const tagName = useRef();
   const { isComment, replyComment, removeTag } = useSelector(
@@ -50,7 +48,7 @@ const SendComment = ({
     async function getUser() {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/users/${currentUser?._id}`
+          `${process.env.REACT_APP_SERVER_URL}/users/${currentUser?._id}`
         );
         setUser(res.data);
       } catch (error) {
@@ -61,12 +59,9 @@ const SendComment = ({
   }, [currentUser?._id]);
   const handleChangeBlock = (e) => {
     setText(e.target.value);
-    setTextHeight();
     setContent(e.target.value);
   };
   useLayoutEffect(() => {
-    setTextHeight(`${textRef?.current?.scrollHeight}px`);
-
     if (textRef?.current?.scrollHeight >= 82) {
       setShow(true);
     } else {
@@ -91,7 +86,7 @@ const SendComment = ({
     // console.log("type", type);
     try {
       setLoading(true);
-      await axios.post("https://serversocial.vercel.app/comments/", value);
+      await axios.post(`${process.env.REACT_APP_SERVER_URL}/comments/`, value);
       play();
       setLoading(false);
       setContent("");
@@ -102,26 +97,26 @@ const SendComment = ({
       dispatch(addComment(!isComment));
 
       const dataNots = {
-        senderName: myUser.username,
+        senderName: currentUser.username,
         receiverName:
           replyData !== null &&
-          replyData !== myUser.username &&
-          receiverName.username === myUser.username
+          replyData !== currentUser.username &&
+          receiverName.userName === currentUser.username
             ? replyData
-            : receiverName.username === myUser.username
+            : receiverName.userName === currentUser.username
             ? null
-            : receiverName.username,
+            : receiverName.userName,
 
         type,
         postImg: dataPostProfile ? dataPostProfile.img.thumb : post.img.thumb,
         postId: dataPostProfile ? dataPostProfile._id : post._id,
-        senderImg: myUser.profilePicture.thumb,
+        senderImg: currentUser.profilePicture.thumb,
       };
-      console.log("type", type);
-      console.log("dataNots", dataNots);
+      // console.log("type", type);
+      // console.log("dataNots", dataNots);
       if (
-        (receiverName.username === myUser.username &&
-          replyData === myUser.username) ||
+        (receiverName.username === currentUser.username &&
+          replyData === currentUser.username) ||
         dataNots.receiverName === null
       )
         return;
@@ -130,7 +125,7 @@ const SendComment = ({
       socket?.emit("sendNotification", dataNots);
       try {
         await axios.post(
-          "https://serversocial.vercel.app/notifications/",
+          `${process.env.REACT_APP_SERVER_URL}/notifications/`,
           dataNots
         );
       } catch (error) {
@@ -149,8 +144,9 @@ const SendComment = ({
   // console.log("receiverName", receiverName.username);
   // console.log("receiverName.username", receiverName.username);
   // console.log("myUser.username", myUser.username);
+  if (!currentUser) return;
   return (
-    <div className="bottom flex px-2 pt-1 items-center justify-between w-full border-transparent    border border-t-slate-200 dark:border-[#363636]">
+    <div className="bottom flex px-2 items-center justify-between w-full border-transparent    border border-t-slate-200 dark:border-[#363636]">
       <div>
         <IconSmile className="dark:text-white"></IconSmile>
       </div>
@@ -165,8 +161,8 @@ const SendComment = ({
             //   height: textHeight,
             //   paddingLeft: removeTag ? 0 : widthTagName + 10 + "px",
             // }}
-            className={`dark:bg-black  dark:text-white w-full ${
-              replyData ? "pt-[20px]" : "pt-[15px]"
+            className={`dark:bg-black  pt-6   dark:text-white w-full ${
+              replyData ? "pt-[20px]" : ""
             } transition-all  text-[14px]   h-full max-h-[72px]  outline-none resize-none ${
               show ? "overflow-y-scroll pt-[20px]" : "overflow-hidden"
             }`}
@@ -202,7 +198,7 @@ const SendComment = ({
               <span
                 onClick={() =>
                   handleCreateComment(
-                    replyData && replyData !== myUser.username ? 8 : 2
+                    replyData && replyData !== currentUser.username ? 8 : 2
                   )
                 }
                 className={`hover:text-blue-900 transition-all interactButton cursor-pointer  text-blue-600 font-semibold`}

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useAuth } from "components/context/Auth-Context";
 import IconAdmin from "components/icons/IconAdmin";
+import ImageLazy from "components/image/ImageLazy";
 import React, { useState } from "react";
 import { useEffect } from "react";
 
@@ -20,7 +21,7 @@ const ChatOnline = ({
     const getFriend = async () => {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/users/friend/${user._id}`
+          `${process.env.REACT_APP_SERVER_URL}/users/friend/${user._id}`
         );
         setFriend(res.data);
       } catch (error) {
@@ -47,7 +48,7 @@ const ChatOnline = ({
   const handleCreateConversation = async (friendOnline) => {
     try {
       const res = await axios.get(
-        `https://serversocial.vercel.app/conversations/find/${user._id}/${friendOnline._id}`
+        `${process.env.REACT_APP_SERVER_URL}/conversations/find/${user._id}/${friendOnline._id}`
       );
       setCurrentChat(res.data);
 
@@ -59,6 +60,7 @@ const ChatOnline = ({
       console.log(error);
     }
   };
+  if (!user) return;
   return (
     <div className="flex flex-col gap-y-3   ">
       <div className="font-semibold text-[15px] px-3 py-5  border border-transparent border-b-slate-300 text-center ">
@@ -72,11 +74,11 @@ const ChatOnline = ({
             className="flex items-center py-3   gap-x-2 px-2 cursor-pointer dark:hover:bg-[#262626] hover:bg-slate-100 transition-all"
           >
             <div className="relative">
-              <img
-                src={o?.profilePicture?.thumb}
-                alt=""
+              <ImageLazy
                 className="w-[30px] h-[30px] rounded-full object-cover"
-              />
+                url={o?.profilePicture?.thumb}
+              ></ImageLazy>
+
               <p className="absolute -top-[2px] -right-[2px] w-[10px] h-[10px] rounded-full bg-green-500"></p>
             </div>
             <div className="font-semibold text-[14px] ">{o.username}</div>

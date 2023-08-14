@@ -11,37 +11,34 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import Header from "components/header/Header";
+import ImageLazy from "components/image/ImageLazy";
 
 const AccountSettingPage = ({ socket }) => {
   const [reviewImage, setReviewImage] = useState("");
   const [progress, setProgress] = useState(0);
-  const [currentUser, setCurrentUser] = useState([]);
+  // const [currentUser, setCurrentUser] = useState([]);
   const [changePassword, setChangePassword] = useState(false);
-  const { user } = useAuth();
+  const { user, dispatch } = useAuth();
+  // console.log("userhere", user);
   const demo = yup.object({});
   const schema = yup.object({
     username: yup.string().required("Please enter your username"),
     currentPassword: yup
       .string()
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-        {
-          message:
-            "Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character",
-        }
-      ),
+      .matches(/.{8,}/, {
+        message: "Password at least 8 character",
+      })
+      .required("Please enter your password"),
     password: yup
       .string()
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-        {
-          message:
-            "Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character",
-        }
-      ),
+      .matches(/.{8,}/, {
+        message: "Password at least 8 character",
+      })
+      .required("Please enter your password"),
     confirmNewPassword: yup
       .string()
-      .oneOf([yup.ref("password"), null], "Passwords must match"),
+      .oneOf([yup.ref("password"), null], "Passwords must match")
+      .required("Please enter your password"),
   });
   const {
     control,
@@ -50,23 +47,23 @@ const AccountSettingPage = ({ socket }) => {
     handleSubmit,
     formState: { isSubmitting, errors },
   } = useForm({
-    mode: "onChange",
+    mode: "onBlur",
     resolver: yupResolver(changePassword ? schema : demo),
   });
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await axios.get(
-          `https://serversocial.vercel.app/users/${user._id}`
-        );
-        setCurrentUser(res.data);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetchData();
-  }, [user._id]);
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       const res = await axios.get(
+  //         `${process.env.REACT_APP_SERVER_URL}/users/${user._id}`
+  //       );
+  //       setCurrentUser(res.data);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }
+  //   fetchData();
+  // }, [user._id]);
 
   useEffect(() => {
     const arrayError = Object.values(errors);
@@ -80,7 +77,7 @@ const AccountSettingPage = ({ socket }) => {
   const handleUpdate = async (values) => {
     if (!user._id) return;
     const data = {
-      userId: currentUser._id,
+      userId: user._id,
       username: values.username.toLowerCase(),
       profilePicture: values.image_post,
       desc: values.desc,
@@ -89,24 +86,31 @@ const AccountSettingPage = ({ socket }) => {
       currentPassword: values?.currentPassword,
     };
     try {
-      await axios.put(`https://serversocial.vercel.app/users/`, data);
+      await axios.put(`${process.env.REACT_APP_SERVER_URL}/users/`, data);
+      dispatch({
+        type: "UPDATE_USER",
+        username: data.username,
+        desc: data.desc,
+        city: data.city,
+        profilePicture: data.profilePicture,
+      });
       toast.success("updated user successfully");
-      window.location.reload();
+      // window.location.reload();
     } catch (error) {
       toast.error(error?.response?.data, {
-        autoClose: 5000,
+        autoClose: 2000,
       });
     }
   };
 
   useEffect(() => {
     reset({
-      username: currentUser?.username,
-      img_post: currentUser?.profilePicture,
-      desc: currentUser?.desc || "",
-      city: currentUser?.city || "",
+      username: user?.username,
+      img_post: user?.profilePicture,
+      desc: user?.desc || "",
+      city: user?.city || "",
     });
-  }, [currentUser, reset]);
+  }, [user, reset]);
   const handleUploadImage = async (e) => {
     const file = e.target.files;
     if (!file) return;
@@ -152,15 +156,15 @@ const AccountSettingPage = ({ socket }) => {
               <div className="flex items-center justify-between w-full mx-auto max-w-[350px]">
                 <div className="w-[80px] relative h-[80px] flex items-center justify-center rounded-full ">
                   {reviewImage ? (
-                    <img
-                      src={reviewImage}
+                    <ImageLazy
+                      url={reviewImage}
                       alt=""
                       className="w-[80px] h-[80px] object-cover rounded-full"
                     />
                   ) : (
-                    <img
-                      src={
-                        currentUser?.profilePicture?.thumb ||
+                    <ImageLazy
+                      url={
+                        user?.profilePicture?.thumb ||
                         "https://i.ibb.co/1dSwFqY/download-1.png"
                       }
                       alt=""

@@ -9,6 +9,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsReload } from "components/redux/globalSlice";
+import ImageLazy from "components/image/ImageLazy";
 
 const TablePost = ({ currentItems }) => {
   const [showModal, setShowModal] = useState(false);
@@ -24,9 +25,10 @@ const TablePost = ({ currentItems }) => {
   // console.log("idPost", idPost);
   const handleDeletePost = async () => {
     try {
-      await axios.delete(`https://serversocial.vercel.app/posts/${idPost}`);
+      await axios.delete(`${process.env.REACT_APP_SERVER_URL}/posts/${idPost}`);
       toast.success("You have been deleted post");
       dispatch(setIsReload(!isReload));
+      setShowModal(false);
     } catch (error) {
       console.log(error);
     }
@@ -58,9 +60,9 @@ const TablePost = ({ currentItems }) => {
               <tr>
                 <td>{index}</td>
                 <td>
-                  <img
-                    src={
-                      item.user.userImg ||
+                  <ImageLazy
+                    url={
+                      item.user.profilePicture?.thumb ||
                       "https://i.ibb.co/1dSwFqY/download-1.png"
                     }
                     className="w-[40px] h-[40px] rounded-full object-cover"
@@ -72,9 +74,9 @@ const TablePost = ({ currentItems }) => {
                   {item.desc.slice(0, 20)}
                 </td>
                 <td>
-                  <img
+                  <ImageLazy
                     className="w-[40px] h-[40px] rounded-xs object-cover"
-                    src={
+                    url={
                       item.img.thumb ||
                       "https://i.ibb.co/1dSwFqY/download-1.png"
                     }

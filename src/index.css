@@ -1,5 +1,6 @@
 body {
   margin: 0;
+
   font-family: "Lato", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -22,17 +23,21 @@ code {
   -webkit-user-select: none;
   -ms-user-select: none;
 }
+
 body {
   background-color: "#FAFAFA";
+  /* background-color: white; */
 }
-body.dark {
-  background-color: #121212;
-}
+
 html {
   /* overflow: hidden; */
+  background-color: "#FAFAFA";
+  color: #111;
 }
 html.dark {
-  background-color: "#121212";
+  /* background-color: #121212; */
+  background-color: #111;
+  color: #bbb;
 }
 .interactButton,
 .btnDots,
@@ -106,6 +111,20 @@ html.dark {
   to {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+.animation-icon {
+  animation: scaleIcon 0.2 linear;
+  transition: all;
+}
+
+@keyframes scaleIcon {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.5);
   }
 }
 .animation-home-logo {
@@ -405,4 +424,62 @@ tr:nth-child(even) {
 /* Hide scrollbar for IE, Edge and Firefox */
 .hideScrollBar::-webkit-scrollbar {
   display: hidden;
+}
+.imagePost .lazy-load-image-background {
+  display: inline-block;
+  width: 100%;
+}
+.lazy-load-image-background {
+  margin: auto;
+}
+.skeleton {
+  /* background: #f0f0f0;
+  background-image: linear-gradient(
+    to right,
+    #f0f0f0 0%,
+    #d8d8d8 20%,
+    #f0f0f0 40%,
+    #f0f0f0 100%
+  ); */
+
+  /* dark */
+  background: #50535a;
+  background-image: linear-gradient(
+    to right,
+    #50535a 0%,
+    #656871 20%,
+    #50535a 40%,
+    #50535a 100%
+  );
+
+  border-radius: 5px;
+  background-size: 200% 100%;
+  animation: 1.5s shine linear infinite;
+}
+
+.skeleton_dark {
+  background: #f0f0f0;
+  background-image: linear-gradient(
+    to right,
+    #f0f0f0 0%,
+    #d8d8d8 20%,
+    #f0f0f0 40%,
+    #f0f0f0 100%
+  );
+
+  border-radius: 5px;
+  background-size: 200% 100%;
+  animation: 1.5s shine linear infinite;
+}
+@keyframes shine {
+  to {
+    background-position-x: -200%;
+  }
+}
+.message-text .lazy-load-image-background {
+  width: 50px;
+  margin: 0px;
+}
+.lazy-load-image-background {
+  margin: auto 0;
 }

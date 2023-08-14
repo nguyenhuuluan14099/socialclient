@@ -2,11 +2,11 @@ import axios from "axios";
 import { AuthProvider, useAuth } from "components/context/Auth-Context";
 import "react-toastify/dist/ReactToastify.css";
 import React, { Suspense, useState } from "react";
-
 import { useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import NotFoundPage from "components/pages/NotFoundPage";
+import GlobalDarkMode from "components/darkMode/GlobalDarkMode";
 const DetailPostPage = React.lazy(() =>
   import("components/pages/DetailPostPage")
 );
@@ -16,7 +16,6 @@ const ManageSystemPage = React.lazy(() =>
 const HomePage = React.lazy(() => import("components/pages/HomePage"));
 const RegisterPage = React.lazy(() => import("components/pages/RegisterPage"));
 const SuggestPage = React.lazy(() => import("components/pages/SuggestPage"));
-const UsersSuggest = React.lazy(() => import("components/pages/UsersSuggest"));
 const LogInPage = React.lazy(() => import("components/pages/LogInPage"));
 const ExplorePage = React.lazy(() => import("components/pages/ExplorePage"));
 const AccountSettingPage = React.lazy(() =>
@@ -32,16 +31,12 @@ const ProfileSaved = React.lazy(() =>
   import("components/pages/profile/ProfileSaved")
 );
 
-const ToggleDarkMode = React.lazy(() =>
-  import("components/darkMode/ToggleDarkMode")
-);
-const HomeLayOut = React.lazy(() => import("components/layout/HomeLayOut"));
+const NavBar = React.lazy(() => import("components/layout/NavBar"));
 const Messenger = React.lazy(() => import("components/messenger/Messenger"));
 
 function App() {
   const [socket, setSocket] = useState(null);
-  const [user, setUser] = useState([]);
-  const { user: currentUser } = useAuth();
+  const { user } = useAuth();
   React.useEffect(() => {
     setSocket(io("https://endsocketne1.onrender.com"));
     // setSocket(io("ws://localhost:8900"));
@@ -52,37 +47,20 @@ function App() {
   }, []);
 
   useEffect(() => {
-    socket?.emit("addNewUser01", user.username);
-    socket?.emit("addUser", user._id);
-  }, [socket, user.username, user._id]);
+    socket?.emit("addNewUser01", user?.username);
+    socket?.emit("addUser", user?._id);
+  }, [socket, user?.username, user?._id]);
 
-  useEffect(() => {
-    if (!currentUser) return;
-    async function getUser() {
-      try {
-        const userBig = await axios.get(
-          `https://serversocial.vercel.app/users?userId=${currentUser?._id}`
-        );
-        setUser(userBig.data);
-      } catch (error) {
-        if (error.code === "ERR_BAD_RESPONSE") {
-          alert("no internet connection");
-        }
-      }
-    }
-    getUser();
-  }, [currentUser, currentUser?._id]);
-
-  const navigate = useNavigate();
-  if (!user) {
-    navigate("/login");
-  }
+  // const navigate = useNavigate();
+  // useEffect(() => {
+  //   if (!user) {
+  //     navigate("/login");
+  //   }
+  // }, [navigate, user]);
 
   return (
-    <div className="dark:bg-[#121212]">
-      <ToggleDarkMode></ToggleDarkMode>
-
-      <AuthProvider>
+    <AuthProvider>
+      <GlobalDarkMode>
         <Suspense>
           <Routes>
             <Route
@@ -91,7 +69,7 @@ function App() {
             ></Route>
             <Route path="/login" element={<LogInPage></LogInPage>}></Route>
             <Route path="*" element={<NotFoundPage></NotFoundPage>}></Route>
-            <Route path="/" element={<HomeLayOut socket={socket}></HomeLayOut>}>
+            <Route path="/" element={<NavBar socket={socket}></NavBar>}>
               <Route
                 path="/post/:slug"
                 element={<DetailPostPage socket={socket}></DetailPostPage>}
@@ -114,10 +92,7 @@ function App() {
                 path="/manageSystem"
                 element={<ManageSystemPage socket={socket}></ManageSystemPage>}
               ></Route>
-              <Route
-                path="/explore/people"
-                element={<UsersSuggest></UsersSuggest>}
-              ></Route>
+
               <Route
                 path="/messenger/*"
                 element={<Messenger socketMes={socket}></Messenger>}
@@ -148,8 +123,8 @@ function App() {
             </Route>
           </Routes>
         </Suspense>
-      </AuthProvider>
-    </div>
+      </GlobalDarkMode>
+    </AuthProvider>
   );
 }
 

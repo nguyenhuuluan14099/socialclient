@@ -5,7 +5,7 @@ import IconHeartNone from "components/icons/IconHeartNone";
 import {
   setToastMes,
   toggleNotification,
-  toggleSideBar,
+  // toggleSideBar,
 } from "components/redux/globalSlice";
 import { listIcons } from "dataSideBar";
 import React, { useEffect, useState } from "react";
@@ -14,10 +14,9 @@ import { Link, NavLink } from "react-router-dom";
 import { toast } from "react-toastify";
 import useSound from "use-sound";
 import soundNotification from "components/sounds/soundNotification.mp3";
+import ImageLazy from "components/image/ImageLazy";
 const Header = ({ socket }) => {
-  const { sideBar, notification, toastMes } = useSelector(
-    (state) => state.global
-  );
+  const { notification, toastMes } = useSelector((state) => state.global);
   const [play] = useSound(soundNotification, {
     volume: 0.75,
   });
@@ -25,13 +24,14 @@ const Header = ({ socket }) => {
   const [notifications, setNotifications] = useState([]);
   const [socketNot, setSocketNot] = useState({});
   const [currentUser, setCurrentUser] = useState([]);
+  const [showSideBar, setShowSideBar] = useState(false);
 
   const { user } = useAuth();
   useEffect(() => {
     async function fetchData() {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/users/${user?._id}`
+          `${process.env.REACT_APP_SERVER_URL}/users/${user?._id}`
         );
         setCurrentUser(res.data);
       } catch (error) {
@@ -44,7 +44,7 @@ const Header = ({ socket }) => {
     async function getNots() {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/notifications/${currentUser?.username}`
+          `${process.env.REACT_APP_SERVER_URL}/notifications/${currentUser?.username}`
         );
 
         setNotifications(res.data.reverse());
@@ -55,7 +55,7 @@ const Header = ({ socket }) => {
     getNots();
   }, [currentUser]);
   const handleClickSidebar = () => {
-    dispatch(toggleSideBar(!sideBar));
+    dispatch(setShowSideBar(!showSideBar));
   };
   const handleClickNotification = () => {
     dispatch(toggleNotification(!notification));
@@ -67,7 +67,6 @@ const Header = ({ socket }) => {
       setSocketNot(data);
     });
   }, [socket, dispatch]);
-  // console.log("socketNot", socketNot);
   useEffect(() => {
     if (toastMes) {
       play();
@@ -78,24 +77,17 @@ const Header = ({ socket }) => {
       dispatch(setToastMes(false));
     }
   }, [play, dispatch, toastMes, currentUser?.username, socketNot.senderName]);
-  // useEffect(() => {
-  //   if (play1) {
-  //   }
-  // }, [play1]);
-  // console.log("socketNot", socketNot);
   useEffect(() => {
-    // if (socketNot.senderName === currentUser.username) return;
     setNotifications((prev) => [...prev, socketNot].reverse());
   }, [socketNot]);
-
+  if (!user) return;
   return (
     <div className="fixed left-0 header-app z-50 right-0 md:px-[100px] top-0 max-w-full w-full  flex items-center justify-between h-[70px] dark:bg-black text-white md:hidden bg-white">
       <Link to="/" className={` h-full text-[20px] font-semibold `}>
-        <img
-          src="/logoHome.png"
+        <ImageLazy
           className="w-[35px] mb-3 mt-5 h-[35px] md:-ml-1 ml-5 object-cover "
-          alt=""
-        />
+          url="/logoHome.png"
+        ></ImageLazy>
       </Link>
       <div className="flex items-center justify-between  ">
         {listIcons.map((item) => {
@@ -109,7 +101,7 @@ const Header = ({ socket }) => {
                   >
                     <div
                       className={`${
-                        sideBar
+                        showSideBar
                           ? "font-[900] dark:text-white text-black dark:bg-black bg-slate-200 border border-slate-300"
                           : ""
                       }   text-slate-600 group:hover:text-red-500 rounded-full p-2`}
@@ -118,7 +110,7 @@ const Header = ({ socket }) => {
                     </div>
                     <p
                       className={`hidden xl:visible ${
-                        sideBar || notification ? "opacity-0" : ""
+                        showSideBar || notification ? "opacity-0" : ""
                       } text-slate-600 dark:text-white -translate-x-[8px]`}
                     >
                       {item.title}
@@ -129,7 +121,6 @@ const Header = ({ socket }) => {
             );
           }
         })}
-
         <div className="notification   cursor-pointer md:flex items-center gap-x-3 group h-[40px] -translate-x-[7px]">
           <div
             className=" flex items-center gap-x-3"
@@ -161,7 +152,7 @@ const Header = ({ socket }) => {
             </div>
             <p
               className={` hidden xl:visible dark:text-white ${
-                sideBar || notification ? "opacity-0" : ""
+                showSideBar || notification ? "opacity-0" : ""
               } text-slate-600 -translate-x-[8px]`}
             >
               Notifications

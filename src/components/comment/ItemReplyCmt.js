@@ -37,7 +37,7 @@ const ItemReplyCmt = ({
   const handleClickReplyCmt = async (type, cmtId) => {
     try {
       await axios.put(
-        `https://serversocial.vercel.app/comments/${cmtId}/like`,
+        `${process.env.REACT_APP_SERVER_URL}/comments/${cmtId}/like`,
         {
           userId: user._id,
         }
@@ -65,9 +65,9 @@ const ItemReplyCmt = ({
     };
     // console.log("dataNots", dataNots);
     // console.log("comment.user.username", comment.user.username);
-    console.log("myUser.username", myUser.username);
-    console.log("comment", comment);
-    console.log("commentList", commentList);
+    // console.log("myUser.username", myUser.username);
+    // console.log("comment", comment);
+    // console.log("commentList", commentList);
     if (
       commentList.user.username === myUser.username &&
       comment.user.username === myUser.username
@@ -76,7 +76,7 @@ const ItemReplyCmt = ({
     socket?.emit("sendNotification", dataNots);
     try {
       await axios.post(
-        "https://serversocial.vercel.app/notifications/",
+        `${process.env.REACT_APP_SERVER_URL}/notifications/`,
         dataNots
       );
     } catch (error) {
@@ -103,7 +103,7 @@ const ItemReplyCmt = ({
     setShowListUserLike(true);
     setCommentId(cmtId);
   };
-  if (!commentList) return;
+  if (!commentList || user) return;
 
   return (
     <>

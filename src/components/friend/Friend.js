@@ -5,29 +5,19 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { v4 } from "uuid";
 import FriendItem from "./FriendItem";
+import ImageLazy from "components/image/ImageLazy";
+import UserLoading from "components/loading/UserLoading";
 
 const Friend = () => {
   const { user } = useAuth();
-  const [currentUser, setCurrentUser] = useState([]);
   const [suggestUser, setSuggestUser] = useState([]);
   useEffect(() => {
     if (!user) return;
-    async function getCurrentUser() {
-      try {
-        const res = await axios.get(
-          `https://serversocial.vercel.app/users/${user?._id}`
-        );
-        setCurrentUser(res.data);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getCurrentUser();
 
     async function getSuggestList() {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/users/suggest/${user?._id}`
+          `${process.env.REACT_APP_SERVER_URL}/users/suggest/${user?._id}`
         );
         setSuggestUser(res.data.filter((user) => user.username));
       } catch (error) {
@@ -35,20 +25,24 @@ const Friend = () => {
       }
     }
     getSuggestList();
-  }, [user, user?._id]);
-  // console.log("suggestUser", suggestUser);
-  if (!currentUser) return;
-  const { username, profilePicture, city } = currentUser;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  if (!user) return;
+  const { username, profilePicture, city } = user;
   // if (!user) return;
   return (
-    <div className="invisible xl:visible lg:block friends flex-3 mt-[50px]  flex flex-col w-full max-w-[350px] gap-y-6">
+    <div className="invisible xl:visible lg:block friends flex-3 my-[20px]  flex flex-col w-full max-w-[350px] gap-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-x-2">
-          <img
-            src={
+          {!profilePicture && !username && !city && (
+            <div className="p-3">
+              <UserLoading profile></UserLoading>
+            </div>
+          )}
+          <ImageLazy
+            url={
               profilePicture?.thumb || "https://i.ibb.co/1dSwFqY/download-1.png"
             }
-            alt=""
             className="w-[70px] h-[70px] object-cover rounded-full"
           />
           <div className="flex flex-col ">
@@ -58,7 +52,7 @@ const Friend = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-y-2">
+      <div className="flex flex-col gap-y-2 mt-10">
         <div className="flex items-center justify-between dark:text-white">
           <p className="text-slate-400 font-semibold ">Suggestions for you</p>
           <Link to={`/explore/people`}>
@@ -66,14 +60,21 @@ const Friend = () => {
           </Link>
         </div>
         <div className="flex flex-col gap-y-3 dark:text-white">
-          {suggestUser.slice(0, 5).length > 0 &&
-            suggestUser.map((suggest) => (
+          {suggestUser.length > 0 ? (
+            suggestUser.slice(0, 4).map((suggest) => (
               <div key={v4()}>
-                <FriendItem data={suggest} story type="following">
-                  View Profile
-                </FriendItem>
+                <FriendItem data={suggest} story type="following"></FriendItem>
               </div>
-            ))}
+            ))
+          ) : (
+            <>
+              <div className="p-3">
+                <UserLoading></UserLoading>
+                <UserLoading></UserLoading>
+                <UserLoading></UserLoading>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

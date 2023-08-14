@@ -1,14 +1,9 @@
-import Dropdown from "components/dropdown/Dropdown";
-import SettingContentDropdown from "components/dropdown/SettingContentDropdown";
-import SettingPost from "components/dropdown/SettingPost";
 import ImageUpload from "components/image/ImageUpload";
 import React, { useEffect, useMemo, useState } from "react";
-import { useController, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Accordion, AccordionItem } from "@szhsin/react-accordion";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+
 import Toggle from "components/toggle/Toggle";
-import TextArea from "components/textarea/TextArea";
 import Input from "components/input";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -16,10 +11,11 @@ import { useAuth } from "components/context/Auth-Context";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleUpdate } from "components/redux/globalSlice";
 
-import ReactQuill, { Quill } from "react-quill";
+import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import IconClose from "components/icons/IconClose";
 import ModalBase from "../ModalBase";
+import ImageLazy from "components/image/ImageLazy";
 const ShareModalContent = ({ onClose = () => {} }) => {
   const [show, setShow] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -58,15 +54,9 @@ const ShareModalContent = ({ onClose = () => {} }) => {
     }
     //values.desc
 
-    const valueUser = {
-      userImg: currentUser.profilePicture.thumb
-        ? currentUser.profilePicture.thumb
-        : currentUser.profilePicture,
-      userName: currentUser.username,
-    };
     const post = {
       userId: currentUser._id,
-      user: valueUser,
+      user: currentUser,
       desc: content,
       img: values.img_post,
       location: values.location,
@@ -76,7 +66,7 @@ const ShareModalContent = ({ onClose = () => {} }) => {
     console.log("values", post);
     // console.log("content", content);
     try {
-      await axios.post("https://serversocial.vercel.app/posts/", post);
+      await axios.post(`${process.env.REACT_APP_SERVER_URL}/posts/`, post);
       reset({
         desc: "",
         location: "",
@@ -92,7 +82,6 @@ const ShareModalContent = ({ onClose = () => {} }) => {
       console.log(error);
     }
   };
-
   const modules = useMemo(
     () => ({
       toolbar: [
@@ -111,7 +100,7 @@ const ShareModalContent = ({ onClose = () => {} }) => {
     async function getUser() {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/users?userId=${currentUser._id}`
+          `${process.env.REACT_APP_SERVER_URL}/users?userId=${currentUser._id}`
         );
         setUser(res.data);
       } catch (error) {
@@ -175,16 +164,23 @@ const ShareModalContent = ({ onClose = () => {} }) => {
   );
   return (
     <div className="flex flex-col  w-full overflow-hidden dark:bg-black">
-      <form onSubmit={handleSubmit(handleSharePost)}>
-        <div className="flex items-center justify-between p-3 border border-transparent border-b-slate-300">
-          <div className="cursor-pointer" onClick={() => setShowConfirm(true)}>
+      <form
+        onSubmit={handleSubmit(handleSharePost)}
+        className="h-[500px] flex flex-col"
+      >
+        <div className="flex shrink-0 h-[50px] items-center justify-between p-3 border border-transparent border-b-slate-300">
+          <div
+            className="cursor-pointer  xl:hidden"
+            onClick={() => setShowConfirm(true)}
+          >
             <IconClose></IconClose>
           </div>
+          <div></div>
           <p className="text-lg ">Create new post</p>
           {isSubmitting ? (
             <>
-              <img
-                src="/logoHome.png"
+              <ImageLazy
+                url="/logoHome.png"
                 className="w-[23px] object-cover animate-spin h-[23px]"
                 alt=""
               />
@@ -198,16 +194,16 @@ const ShareModalContent = ({ onClose = () => {} }) => {
           )}
         </div>
         {/* h-[500px] */}
-        <div className="flex flex-col xl:flex-row top-0  w-full  items-center ">
-          <div className="flex items-center justify-center w-full max-w-[80%] h-full max-h-[300px]">
+        <div className="flex flex-1 h-full max-h-[450px] flex-col xl:flex-row top-0  w-full  ">
+          <div className=" flex items-center justify-center w-full max-w-[80%] h-full overflow-hidden">
             <ImageUpload onChange={setValue} name="img_post"></ImageUpload>
           </div>
 
           <div className="  h-[400px] max-h-full overflow-x-hidden overflow-y-scroll flex flex-col justify-between gap-y-2   w-full max-w-[350px]">
             <div className="p-4 h-[200px] shrink-0 flex flex-col gap-y-3">
               <div className="flex items-center gap-x-2">
-                <img
-                  src={
+                <ImageLazy
+                  url={
                     user?.profilePicture?.thumb ||
                     "https://i.ibb.co/1dSwFqY/download-1.png"
                   }
@@ -231,7 +227,7 @@ const ShareModalContent = ({ onClose = () => {} }) => {
               {/* textarea here */}
             </div>
             <div className="w-full mt-auto flex flex-col   ">
-              <div className="px-3 p-1 border border-b-transparent border-slate-300 flex items-center justify-between">
+              <div className=" p-1 border border-b-transparent border-slate-300 flex items-center justify-between">
                 <Input
                   control={control}
                   name="location"

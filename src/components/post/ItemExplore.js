@@ -1,12 +1,13 @@
 import React from "react";
 import IconHeart from "components/icons/IconHeart";
 import { Link } from "react-router-dom";
+import ImageLazy from "components/image/ImageLazy";
 const ItemExplore = ({ post }) => {
   if (!post) return;
   return (
     <div className="w-full h-full relative group">
-      <img
-        src={post.img.url}
+      <ImageLazy
+        url={post.img.url}
         alt="image_post"
         className="w-[300px] h-[300px] object-cover"
       />

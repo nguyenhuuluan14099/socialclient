@@ -1,35 +1,31 @@
 import axios from "axios";
-import { Interaction } from "chart.js";
 import { useAuth } from "components/context/Auth-Context";
-import Friend from "components/friend/Friend";
 import FriendItem from "components/friend/FriendItem";
 import IconClose from "components/icons/IconClose";
-import Loading from "components/loading/Loading";
+import UserLoading from "components/loading/UserLoading";
 import { setShowLoading } from "components/redux/globalSlice";
 import { debounce } from "lodash";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { v4 } from "uuid";
 
 const SearchModalContent = ({ onClose = () => {} }) => {
   const [value, setValue] = useState("");
   const [userList, setUserList] = useState([]);
-  const { isLoading } = useSelector((state) => state.global);
   const dispatch = useDispatch();
   const handleInput = debounce((e) => {
     setValue(e.target.value);
   }, 1000);
+
   useEffect(() => {
     if (!value) return;
     async function getUser() {
       try {
-        dispatch(setShowLoading(true));
         const res = await axios.get(
-          `https://serversocial.vercel.app/users/search/${value}`
+          `${process.env.REACT_APP_SERVER_URL}/users/search/${value}`
         );
-        dispatch(setShowLoading(false));
 
         setUserList(res.data);
       } catch (error) {
@@ -44,21 +40,12 @@ const SearchModalContent = ({ onClose = () => {} }) => {
   const [suggestUser, setSuggestUser] = useState([]);
   useEffect(() => {
     if (!user) return;
-    // async function getCurrentUser() {
-    //   try {
-    //     const res = await axios.get(`https://serversocial.vercel.app/users/${user?._id}`);
-    //     setCurrentUser(res.data);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // }
-    // getCurrentUser();
-
     async function getSuggestList() {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/users/suggest/${user?._id}`
+          `${process.env.REACT_APP_SERVER_URL}/users/suggest/${user?._id}`
         );
+
         setSuggestUser(res.data.filter((user) => user.username));
       } catch (error) {
         console.log(error);
@@ -66,6 +53,7 @@ const SearchModalContent = ({ onClose = () => {} }) => {
     }
     getSuggestList();
   }, [user, user?._id]);
+  if (!user) return;
   return (
     <div className="flex h-full flex-col dark:bg-black dark:text-white">
       <div className="p-5 py-5 h-[150px] shrink-0 justify-between  flex flex-col ">
@@ -76,22 +64,21 @@ const SearchModalContent = ({ onClose = () => {} }) => {
           </p>
         </div>
         <div className="relative">
-          <input
-            onChange={handleInput}
-            type="text"
-            placeholder="Search"
-            className=" w-full p-2 rounded-lg outline-none bg-[#ccc] bg-opacity-40 "
-          ></input>
-          <div className="bg-[#ccc] bg-opacity-80 text-slate-700 absolute right-2 w-[15px] rounded-full  h-[15px] top-3  flex items-center justify-center">
-            <p>&times;</p>
-          </div>
+          <form>
+            <input
+              onChange={handleInput}
+              type="text"
+              placeholder="Search"
+              className=" w-full  p-2 rounded-lg outline-none bg-[#ccc] bg-opacity-40 "
+            ></input>
+            <label className="bg-[#ccc] cursor-pointer bg-opacity-80 text-slate-700 absolute right-2 w-[15px] rounded-full  h-[15px] top-3  flex items-center justify-center">
+              <p>&times;</p>
+              <input type="reset" hidden />
+            </label>
+          </form>
         </div>
       </div>
-      {isLoading && (
-        <div className="mt-[100px]">
-          <Loading></Loading>
-        </div>
-      )}
+
       {userList.length !== 0 ? (
         <>
           <div className="flex flex-col gap-y-2 p-5 h-[200px] overflow-y-auto">
@@ -128,6 +115,13 @@ const SearchModalContent = ({ onClose = () => {} }) => {
               View Profile
             </FriendItem>
           ))}
+        {suggestUser.length === 0 && (
+          <div className="p-3">
+            <UserLoading></UserLoading>
+            <UserLoading></UserLoading>
+            <UserLoading></UserLoading>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -4,8 +4,7 @@ import { io } from "socket.io-client";
 const globalSlice = createSlice({
   name: "global",
   initialState: {
-    darkMode: true,
-    sideBar: false,
+    // sideBar: false,
     isUpdate: false,
     isComment: false,
     isLiked: false,
@@ -23,14 +22,10 @@ const globalSlice = createSlice({
     totalSaved: 0,
   },
   reducers: {
-    toggleDarkMode: (state, { payload }) => ({
-      ...state,
-      darkMode: payload,
-    }),
-    toggleSideBar: (state, { payload }) => ({
-      ...state,
-      sideBar: payload,
-    }),
+    // toggleSideBar: (state, { payload }) => ({
+    //   ...state,
+    //   sideBar: payload,
+    // }),
     toggleUpdate: (state, { payload }) => ({
       ...state,
       isUpdate: payload,
@@ -100,8 +95,7 @@ export const {
   setReloadOnLineFriend,
   setReloadMes,
   setReplyComment,
-  toggleDarkMode,
-  toggleSideBar,
+  // toggleSideBar,
   toggleUpdate,
   setIsReload,
   addComment,

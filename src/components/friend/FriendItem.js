@@ -1,6 +1,10 @@
+import axios from "axios";
+import { useAuth } from "components/context/Auth-Context";
 import ImageUser from "components/image/ImageUser";
-import React from "react";
+
+import React, { memo, useState } from "react";
 import { Link } from "react-router-dom";
+import FollowBlock from "./FollowBlock";
 
 const FriendItem = ({
   data,
@@ -8,16 +12,13 @@ const FriendItem = ({
   info = "Suggested for you",
   classNameImg = "",
   story = false,
-  onClose = () => {},
   username,
-  city,
-  children,
 }) => {
+  console.log("re-render");
   if (!data) return;
   return (
     <div className="info flex items-center justify-between dark:text-white">
       <div className="flex items-center gap-x-3 cursor-pointer">
-        {/* fdsfdsfds */}
         <ImageUser
           smallImg={smallImg}
           data={data}
@@ -29,13 +30,13 @@ const FriendItem = ({
             story ? "" : "translate-x-[5px]"
           } flex flex-col  text-slate-600 dark:text-white`}
         >
-          <p className="text-[13px] font-semibold">
+          <Link to={`/${data.username}`} className="text-[13px] font-semibold">
             {data?.username || username}
-          </p>
+          </Link>
           <p className="text-[13px] text-slate-400">{info}</p>
         </div>
       </div>
-      <Link
+      {/* <Link
         to={`/${data.username}`}
         onClick={() =>
           setTimeout(() => {
@@ -45,7 +46,9 @@ const FriendItem = ({
         className="bg-blue-500 p-1 text-[13px] text-white  rounded-lg hover:text-blue-700 transition-all"
       >
         {children}
-      </Link>
+      </Link> */}
+
+      <FollowBlock data={data}></FollowBlock>
     </div>
   );
 };

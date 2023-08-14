@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { format } from "timeago.js";
 import { v4 } from "uuid";
 import ModalBase from "../ModalBase";
+import ImageLazy from "components/image/ImageLazy";
 
 const NotificationModalContent = ({
   user,
@@ -25,7 +26,7 @@ const NotificationModalContent = ({
   const handleMarkAllRead = async () => {
     try {
       await axios.delete(
-        `https://serversocial.vercel.app/notifications/${user.username}`
+        `${process.env.REACT_APP_SERVER_URL}/notifications/${user?.username}`
       );
       dispatch(setMarkNot(!markNot));
       setNotifications([]);
@@ -89,8 +90,8 @@ const NotificationModalContent = ({
     return (
       <div className="w-full flex items-center  justify-between py-2">
         <Link to={`${senderName}`}>
-          <img
-            src={senderImg || "https://i.ibb.co/1dSwFqY/download-1.png"}
+          <ImageLazy
+            url={senderImg || "https://i.ibb.co/1dSwFqY/download-1.png"}
             className="w-[40px] h-[40px] rounded-full object-cover shrink-0"
             alt=""
           />
@@ -122,8 +123,8 @@ const NotificationModalContent = ({
             ) : (
               <>
                 <Link to={`/post/${postId}`}>
-                  <img
-                    src={postImg}
+                  <ImageLazy
+                    url={postImg}
                     className="w-[40px] h-[40px] object-cover shrink-0"
                     alt=""
                   />
@@ -145,7 +146,7 @@ const NotificationModalContent = ({
           </p>
         </div>
 
-        <div className="w-full  flex flex-col dark:bg-black h-full max-h-[700px] overflow-y-auto">
+        <div className="w-full  flex flex-col dark:bg-black h-full max-h-[550px] overflow-y-auto">
           {notifications.length > 0 &&
             notifications.map((not) => (
               <div
@@ -158,15 +159,17 @@ const NotificationModalContent = ({
               </div>
             ))}
         </div>
-
-        <div>
+        {notifications.length !== 0 && (
           <button
             onClick={() => setShowModal(true)}
-            className="w-full mt-auto  p-3 left-0 bg-blue-500 rounded-lg text-white"
+            className="w-full top-0  p-3 left-0 bg-blue-500 rounded-lg text-white"
           >
             Mark all read
           </button>
-        </div>
+        )}
+        <p className="text-slate-300 text-xl font-bold p-3  ">
+          Don't have any notifications
+        </p>
       </div>
       {showModal && (
         <ModalBase visible={showModal} onClose={() => setShowModal(false)}>

@@ -68,7 +68,7 @@ const ItemComment = ({
     async function getCmt() {
       try {
         const cmt = await axios.get(
-          `https://serversocial.vercel.app/comments/getOne/${commentId}`
+          `${process.env.REACT_APP_SERVER_URL}/comments/getOne/${commentId}`
         );
         setOneCmt(cmt.data);
       } catch (error) {
@@ -94,7 +94,9 @@ const ItemComment = ({
     // console.log("idCmt", idCmt);
 
     try {
-      await axios.delete(`https://serversocial.vercel.app/comments/${idCmt}`);
+      await axios.delete(
+        `${process.env.REACT_APP_SERVER_URL}/comments/${idCmt}`
+      );
       dispatch(addComment(!isComment));
     } catch (error) {
       console.log(error);
@@ -105,7 +107,7 @@ const ItemComment = ({
     async function getUser() {
       try {
         const userBig = await axios.get(
-          `https://serversocial.vercel.app/users?userId=${user._id}`
+          `${process.env.REACT_APP_SERVER_URL}/users?userId=${user._id}`
         );
         setMyUser(userBig.data);
       } catch (error) {
@@ -117,7 +119,7 @@ const ItemComment = ({
   const handleClickLikeCmt = async (type) => {
     try {
       await axios.put(
-        `https://serversocial.vercel.app/comments/${comment._id}/like`,
+        `${process.env.REACT_APP_SERVER_URL}/comments/${comment._id}/like`,
         {
           userId: user._id,
         }
@@ -148,7 +150,7 @@ const ItemComment = ({
     socket?.emit("sendNotification", dataNots);
     try {
       await axios.post(
-        "https://serversocial.vercel.app/notifications/",
+        `${process.env.REACT_APP_SERVER_URL}/notifications/`,
         dataNots
       );
     } catch (error) {
@@ -166,7 +168,7 @@ const ItemComment = ({
     async function getUserLikeList() {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/comments/${commentId}/listUser`
+          `${process.env.REACT_APP_SERVER_URL}/comments/${commentId}/listUser`
         );
         setListUserLike(res.data);
       } catch (error) {
@@ -189,6 +191,7 @@ const ItemComment = ({
   if (timeCreate[1] === "now") {
     result = "now";
   }
+  if (!user) return;
   return (
     <>
       {

@@ -2,6 +2,7 @@ import ModalBase from "components/modal/ModalBase";
 import DetailPostModalContent from "components/modal/ModalContent/DetailPostModalContent";
 import React, { useEffect, useState } from "react";
 import IconHeart from "components/icons/IconHeart";
+import ImageLazy from "components/image/ImageLazy";
 
 const ItemPost = ({ post, socket }) => {
   const [show, setShow] = useState(false);
@@ -15,9 +16,11 @@ const ItemPost = ({ post, socket }) => {
   return (
     <>
       <div className="w-full max-w-[300px]  h-[120px] md:h-[200px]  xl:h-[250px] relative group">
-        <img
-          src={post?.img?.url || "https://i.ibb.co/1dSwFqY/download-1.png"}
+        <ImageLazy
+          url={post?.img?.url || "https://i.ibb.co/1dSwFqY/download-1.png"}
           alt=""
+          width="100%"
+          height="120px"
           className="w-full top-0 h-[120px] md:h-[200px]  xl:h-[250px] object-cover z-5 absolute"
         />
         <div

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useAuth } from "components/context/Auth-Context";
+import ImageLazy from "components/image/ImageLazy";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
@@ -14,7 +15,7 @@ const UserStore = ({ friendOnline }) => {
     const getFriend = async () => {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/users/friend/${user?._id}`
+          `${process.env.REACT_APP_SERVER_URL}/users/friend/${user._id}`
         );
         setFriend(res.data);
       } catch (error) {
@@ -23,12 +24,12 @@ const UserStore = ({ friendOnline }) => {
     };
 
     getFriend();
-  }, [dispatch, user?._id]);
+  }, [dispatch, user._id]);
   useEffect(() => {
     setOnlineFriends(friend.filter((fr) => friendOnline?.includes(fr._id)));
   }, [friend, friendOnline]);
   // console.log("onlineFriends", onlineFriends);
-
+  if (!user) return;
   return (
     <>
       <div
@@ -43,8 +44,8 @@ const UserStore = ({ friendOnline }) => {
             <Link to={`/${item.username}`} className="" key={item._id}>
               <div className="flex flex-col w-full items-center max-w-[70px] p-1   gap-y-1  justify-center  ">
                 <div className="w-[40px] h-[40px] relative ">
-                  <img
-                    src={
+                  <ImageLazy
+                    url={
                       item.profilePicture.thumb ||
                       "https://i.ibb.co/1dSwFqY/download-1.png"
                     }

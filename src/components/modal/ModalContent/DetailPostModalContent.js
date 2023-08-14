@@ -32,6 +32,7 @@ import IconSaved from "components/icons/IconSaved";
 import IconBack from "components/icons/IconBack";
 import IconAdmin from "components/icons/IconAdmin";
 import IconPlus from "components/icons/IconPlus";
+import ImageLazy from "components/image/ImageLazy";
 
 const DetailPostModalContent = ({
   dataPostProfile,
@@ -82,7 +83,9 @@ const DetailPostModalContent = ({
     if (dataPostProfile) return;
     async function getData() {
       try {
-        const res = await axios.get(`https://serversocial.vercel.app/posts/${slug}`);
+        const res = await axios.get(
+          `${process.env.REACT_APP_SERVER_URL}/posts/${slug}`
+        );
         setPost(res.data);
       } catch (error) {
         console.log(error);
@@ -98,7 +101,7 @@ const DetailPostModalContent = ({
   const handleClickLike = async (type) => {
     try {
       await axios.put(
-        `https://serversocial.vercel.app/posts/${
+        `${process.env.REACT_APP_SERVER_URL}/posts/${
           dataPostProfile?._id ? dataPostProfile?._id : post?._id
         }/like/`,
         {
@@ -139,7 +142,10 @@ const DetailPostModalContent = ({
       return;
     socket?.emit("sendNotification", dataNots);
     try {
-      await axios.post("https://serversocial.vercel.app/notifications/", dataNots);
+      await axios.post(
+        `${process.env.REACT_APP_SERVER_URL}/notifications/`,
+        dataNots
+      );
     } catch (error) {
       console.log(error);
     }
@@ -151,7 +157,7 @@ const DetailPostModalContent = ({
     async function getUser() {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/users/${dataPostProfile?.userId}`
+          `${process.env.REACT_APP_SERVER_URL}/users/${dataPostProfile?.userId}`
         );
         setModalUser(res.data);
       } catch (error) {
@@ -165,7 +171,7 @@ const DetailPostModalContent = ({
     async function getUser() {
       try {
         const userBig = await axios.get(
-          `https://serversocial.vercel.app/users?userId=${currentUser?._id}`
+          `${process.env.REACT_APP_SERVER_URL}/users?userId=${currentUser?._id}`
         );
         setMyUser(userBig.data);
       } catch (error) {
@@ -179,7 +185,7 @@ const DetailPostModalContent = ({
     async function getUser() {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/users/${post?.userId}`
+          `${process.env.REACT_APP_SERVER_URL}/users/${post?.userId}`
         );
         setUser(res.data);
       } catch (error) {
@@ -195,7 +201,7 @@ const DetailPostModalContent = ({
         dispatch(setShowLoading(true));
 
         const res = await axios.get(
-          "https://serversocial.vercel.app/posts/profile/" + user?.username
+          `${process.env.REACT_APP_SERVER_URL}/posts/profile/` + user?.username
         );
         dispatch(setShowLoading(false));
 
@@ -217,7 +223,7 @@ const DetailPostModalContent = ({
         dispatch(setShowLoading(true));
 
         const res = await axios.get(
-          `https://serversocial.vercel.app/comments/${
+          `${process.env.REACT_APP_SERVER_URL}/comments/${
             dataPostProfile ? dataPostProfile?._id : post._id
           }`
         );
@@ -266,7 +272,7 @@ const DetailPostModalContent = ({
     setSaved(!saved);
     try {
       await axios.put(
-        `https://serversocial.vercel.app/posts/saved/${
+        `${process.env.REACT_APP_SERVER_URL}/posts/saved/${
           dataPostProfile ? dataPostProfile._id : post._id
         }`,
         {
@@ -333,8 +339,8 @@ const DetailPostModalContent = ({
               <IconBtnDots></IconBtnDots>
             </div>
           </div>
-          <img
-            src={post?.img?.url || dataPostProfile?.img.url}
+          <ImageLazy
+            url={post?.img?.url || dataPostProfile?.img.url}
             alt=""
             className={`object-cover w-full md:my-auto   max-h-[450px] md:max-h-[500px]`}
           />
@@ -551,8 +557,8 @@ const DetailPostModalContent = ({
                   key={p._id}
                   className="w-full  relative group  top-0  h-[100px] md:h-[200px]  xl:h-[250px]"
                 >
-                  <img
-                    src={
+                  <ImageLazy
+                    url={
                       p?.img?.url ||
                       "https://media.istockphoto.com/id/1455943818/fr/photo/larchitecte-prend-des-notes-sur-le-plan-puis-les-saisit-dans-lordinateur-portable-pour.jpg?b=1&s=170667a&w=0&k=20&c=_h8_mP3IanFwD84ya25XFzC4hq3MI2sXRY6hMIyCSvg="
                     }

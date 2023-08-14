@@ -2,9 +2,8 @@ import axios from "axios";
 import { useAuth } from "components/context/Auth-Context";
 import Header from "components/header/Header";
 import Loading from "components/loading/Loading";
-import ItemExplore from "components/post/ItemExplore";
+import LoadingSkeleton from "components/loading/LoadingSkeleton";
 import ItemPost from "components/post/ItemPost";
-import { setShowLoading } from "components/redux/globalSlice";
 
 import React, { useState } from "react";
 import { useEffect } from "react";
@@ -15,7 +14,8 @@ const ExplorePage = ({ socket }) => {
   const { user } = useAuth();
   const [suggestUser, setSuggestUser] = useState([]);
   const [suggestPosts, setSuggestPosts] = useState([]);
-  const { isLoading } = useSelector((state) => state.global);
+  // const { isLoading } = useSelector((state) => state.global);
+  const [loading, setLoading] = useState(false);
 
   const [numberItem, setNumberItem] = useState(6);
   const dispatch = useDispatch();
@@ -23,13 +23,12 @@ const ExplorePage = ({ socket }) => {
   useEffect(() => {
     async function getSuggestList() {
       try {
-        dispatch(setShowLoading(true));
+        setLoading(true);
         const res = await axios.get(
-          `https://serversocial.vercel.app/users/suggest/${user._id}`
+          `${process.env.REACT_APP_SERVER_URL}/users/suggest/${user._id}`
         );
         setSuggestUser(res.data);
-        dispatch(setShowLoading(false));
-
+        setLoading(false);
         // setAllPost(allPost);
       } catch (error) {
         console.log(error);
@@ -47,23 +46,31 @@ const ExplorePage = ({ socket }) => {
   const handleLoadMore = () => {
     setNumberItem(numberItem + 6);
   };
-  // console.log("suggestPost", suggestPosts);
+  if (!user) return;
+  console.log("suggestPost", suggestPosts);
   return (
     <>
-      <Header socket={socket}></Header>
+      {/* <Header socket={socket}></Header> */}
       <div className="my-16 mr-[200px] w-full">
-        {suggestPosts.length === 0 && (
+        {suggestPosts.length === 0 ? (
           <div className="text-slate-600 font-semibold mx-auto  text-xl">
-            No post suggested
+            No Post Suggest
           </div>
+        ) : (
+          <p className="text-slate-600 font-semibold mx-auto  text-xl">
+            Post Suggest
+          </p>
         )}
-        <div className="py-7 grid grid-cols-3 gap-3 xl:gap-7">
-          {isLoading && (
-            <div className="w-full  h-[600px] ">
-              <Loading className="w-[80px] h-[80px] mx-auto"></Loading>
-            </div>
+        <div className="py-7 grid grid-cols-3 gap-3 xl:gap-2">
+          {loading && (
+            <>
+              <LoadingSkeleton width="300px" height="250px"></LoadingSkeleton>
+              <LoadingSkeleton width="300px" height="250px"></LoadingSkeleton>
+              <LoadingSkeleton width="300px" height="250px"></LoadingSkeleton>
+            </>
           )}
-          {suggestPosts.length > 0 &&
+          {!loading &&
+            suggestPosts.length > 0 &&
             suggestPosts.slice(0, numberItem).map((post) => (
               <div key={post._id} className="">
                 <ItemPost socket={socket} post={post}></ItemPost>

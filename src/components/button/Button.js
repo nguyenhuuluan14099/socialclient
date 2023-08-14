@@ -38,7 +38,7 @@ const Button = ({
       {isWaiting ? (
         <div className="w-[27px] h-[27px] border-t-transparent animate-spin border-b-transparent rounded-full border-white border-[3px]"></div>
       ) : (
-        children
+        <span className="font-semibold">{children}</span>
       )}
     </button>
   );

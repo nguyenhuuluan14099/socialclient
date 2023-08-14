@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 // import { format } from "timeago.js";
 import { v4 } from "uuid";
 import { format } from "date-fns";
+import ImageLazy from "components/image/ImageLazy";
 const Table = ({ currentItems }) => {
   if (!currentItems) return;
   return (
@@ -34,8 +35,8 @@ const Table = ({ currentItems }) => {
               <tr>
                 <td>{index}</td>
                 <td>
-                  <img
-                    src={
+                  <ImageLazy
+                    url={
                       item.profilePicture.thumb ||
                       "https://i.ibb.co/1dSwFqY/download-1.png"
                     }

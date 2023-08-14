@@ -1,8 +1,8 @@
 import React from "react";
 
-const IconBack = ({ onClick = () => {} }) => {
+const IconBack = ({ onClick = () => {}, className = "" }) => {
   return (
-    <span onClick={onClick}>
+    <span onClick={onClick} className={className}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"

@@ -2,12 +2,12 @@ import axios from "axios";
 import { useAuth } from "components/context/Auth-Context";
 import IconBtnDots from "components/icons/IconBtnDots";
 import ModalBase from "components/modal/ModalBase";
-import { setMessage, setReloadMes } from "components/redux/globalSlice";
-import React, { useRef, useState } from "react";
-import { useEffect } from "react";
+import { setReloadMes } from "components/redux/globalSlice";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 // import { format } from "timeago.js";
 import { format } from "date-fns";
+import ImageLazy from "components/image/ImageLazy";
 
 const Message = ({ own = false, message, yourFriend, myUser }) => {
   const [showValid, setShowValid] = useState(false);
@@ -16,8 +16,9 @@ const Message = ({ own = false, message, yourFriend, myUser }) => {
   const dispatch = useDispatch();
   const handleDeleteMessage = async (id) => {
     try {
-      await axios.delete(`https://serversocial.vercel.app/messages/${id}`);
+      await axios.delete(`${process.env.REACT_APP_SERVER_URL}/messages/${id}`);
       dispatch(setReloadMes(!reloadMes));
+      // setMessages(messages.filter(mes => mes.id !== id))
     } catch (error) {
       console.log(error);
     }
@@ -27,18 +28,17 @@ const Message = ({ own = false, message, yourFriend, myUser }) => {
   return (
     <div className="dark:text-white">
       <div
-        className={` flex mx-3     gap-x-2 my-3 ${
+        className={` flex mx-3 message-text    gap-x-2 my-3 ${
           own ? " flex-row-reverse" : ""
         }`}
       >
-        <img
-          src={
+        <ImageLazy
+          url={
             (own
               ? myUser?.profilePicture?.thumb
               : yourFriend?.profilePicture?.thumb) ||
             "https://i.ibb.co/1dSwFqY/download-1.png"
           }
-          alt=""
           className="w-[30px] h-[30px] rounded-full object-cover"
         />
         <div
@@ -54,10 +54,11 @@ const Message = ({ own = false, message, yourFriend, myUser }) => {
             }`}
           >
             {message.imageMes && (
-              <img
-                src={message.imageMes.url}
-                className="object-contain rounded-lg w-full h-full"
-                alt=""
+              <ImageLazy
+                width="100%"
+                height="100%"
+                url={message.imageMes.url}
+                className="object-cover rounded-lg w-full h-full"
               />
             )}
             <div className={` ${own ? "ml-auto" : "mr-auto"} `}>

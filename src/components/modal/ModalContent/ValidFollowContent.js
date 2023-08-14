@@ -1,3 +1,4 @@
+import ImageLazy from "components/image/ImageLazy";
 import React from "react";
 
 const ValidFollowContent = ({
@@ -9,14 +10,16 @@ const ValidFollowContent = ({
     handleUnFollow() && handleUnFollow();
     onClose();
   };
+  // console.log("user", user);
   return (
     <div className="w-full">
       <div className="flex justify-between p-3 border border-transparent border-b-slate-300 w-full">
         <p></p>
         <div className="flex ml-[50px] flex-col items-center gap-y-2">
-          <img
+          <ImageLazy
             className="w-[80px] h-[80px] rounded-full object-cover"
-            src={
+            url={
+              user.profilePicture ||
               user?.profilePicture?.thumb ||
               "https://photo-cms-plo.epicdn.me/w850/Uploaded/2023/pwvotwiv/2023_03_12/15-mau-mbappe-roi-psg-didau-mar-7121.jpg"
             }

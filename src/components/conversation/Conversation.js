@@ -1,8 +1,7 @@
 import axios from "axios";
 import { useAuth } from "components/context/Auth-Context";
 import IconAdmin from "components/icons/IconAdmin";
-import IconBtnDots from "components/icons/IconBtnDots";
-import ModalBase from "components/modal/ModalBase";
+import ImageLazy from "components/image/ImageLazy";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { format } from "timeago.js";
@@ -15,6 +14,7 @@ const Conversation = ({
 }) => {
   const [user, setUser] = useState(null);
   const { user: myUser } = useAuth();
+
   // console.log("cov", conversations._id);
   // const { message } = useSelector((state) => state.global);
   // console.log("message", message);
@@ -26,7 +26,7 @@ const Conversation = ({
     async function getMessage() {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/messages/${conversations._id}`
+          `${process.env.REACT_APP_SERVER_URL}/messages/${conversations._id}`
         );
         setLastMess(res.data.slice(-1));
       } catch (error) {
@@ -48,7 +48,7 @@ const Conversation = ({
       const friendId = conversations.members.find((m) => m !== currentUser._id);
       try {
         const res = await axios(
-          "https://serversocial.vercel.app/users?userId=" + friendId
+          `${process.env.REACT_APP_SERVER_URL}/users?userId=` + friendId
         );
         setUser(res.data);
       } catch (error) {
@@ -62,18 +62,18 @@ const Conversation = ({
   // console.log("lastMess.sender", lastMess.sender);
   // console.log("myUser._id", myUser._id);
   // console.log("lastMess.sender === myUser._id", lastMess.sender === myUser._id);
-
+  if (!myUser) return;
   return (
     <div className="flex group items-center gap-x-3 p-3 dark:hover:bg-[#262626]  cursor-pointer hover:bg-slate-100 transition-all">
       <div className="w-[50px] h-[50px]  shrink-0 relative">
-        <img
-          src={
+        <ImageLazy
+          className="w-[50px] h-[50px] rounded-full object-cover "
+          url={
             user?.profilePicture?.thumb ||
             "https://i.ibb.co/1dSwFqY/download-1.png"
           }
-          alt=""
-          className="w-[50px] h-[50px] rounded-full object-cover "
-        />
+        ></ImageLazy>
+
         {user?._id === onLine?._id && (
           <div className="w-[13px] h-[13px] rounded-full bg-green-500 absolute bottom-0 right-0"></div>
         )}

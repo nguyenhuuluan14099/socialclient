@@ -1,19 +1,15 @@
+import ImageLazy from "components/image/ImageLazy";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
-const Loading = ({ className = "" }) => {
+const Loading = ({ className = "", show = false }) => {
   // const [showLoading, setShowLoading] =  useState(false)
-  const { isLoading } = useSelector((state) => state.global);
+  // const { isLoading } = useSelector((state) => state.global);
+
   return (
     <>
-      {isLoading && (
-        <div className="w-full h-full flex">
-          <img
-            src="/logoHome.png"
-            className={`mx-auto w-[30px] h-[30px] my-auto object-cover animate-spin ${className}`}
-            alt=""
-          />
-        </div>
+      {show && (
+        <div className="loading w-20 h-20 rounded-full   border-blue-500 border-3 border-t-transparent border-b-transparent animate-spin"></div>
       )}
     </>
   );

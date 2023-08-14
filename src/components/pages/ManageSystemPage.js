@@ -82,7 +82,7 @@ const ManageSystemPage = ({ socket }) => {
     async function getUser() {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/users/listUser/${user._id}`
+          `${process.env.REACT_APP_SERVER_URL}/users/listUser/${user._id}`
         );
         setUsers(res.data);
       } catch (error) {
@@ -95,7 +95,7 @@ const ManageSystemPage = ({ socket }) => {
     async function getPosts() {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/posts/listPost/${user._id}`
+          `${process.env.REACT_APP_SERVER_URL}/posts/listPost/${user._id}`
         );
         setPosts(res.data);
       } catch (error) {
@@ -111,6 +111,7 @@ const ManageSystemPage = ({ socket }) => {
         You don't have permission to access this page
       </div>
     );
+  if (!user) return;
   return (
     <>
       <Header socket={socket}></Header>

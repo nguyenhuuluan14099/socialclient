@@ -1,8 +1,7 @@
 import axios from "axios";
-import { useAuth } from "components/context/Auth-Context";
-import { setIsReload, toggleUpdate } from "components/redux/globalSlice";
+import { setIsReload } from "components/redux/globalSlice";
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import ModalBase from "../ModalBase";
@@ -13,7 +12,6 @@ const PostModalContent = ({ onClose = () => {}, ...rest }) => {
   // console.log("postId", postId);
   // console.log("userId", userId);
   const [demoHide, setDemoHide] = useState(false);
-  const { user } = useAuth();
   const [permission, setPermission] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [modalValid, setModalValid] = useState(false);
@@ -44,7 +42,7 @@ const PostModalContent = ({ onClose = () => {}, ...rest }) => {
 
   const handleDeletePost = async () => {
     try {
-      await axios.delete(`https://serversocial.vercel.app/posts/${postId}`);
+      await axios.delete(`${process.env.REACT_APP_SERVER_URL}/posts/${postId}`);
       toast.success("Delete post successfully!");
       setModalValid(false);
       dispatch(setIsReload(true));

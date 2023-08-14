@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import IconBack from "components/icons/IconBack";
+import ImageLazy from "components/image/ImageLazy";
 
 const EditModalContent = ({
   postId,
@@ -35,7 +36,7 @@ const EditModalContent = ({
     async function getUser() {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/users/${currentUser._id}`
+          `${process.env.REACT_APP_SERVER_URL}/users/${currentUser._id}`
         );
         setUser(res.data);
       } catch (error) {
@@ -68,7 +69,10 @@ const EditModalContent = ({
       hideLike: values.hideLike,
     };
     try {
-      await axios.put(`https://serversocial.vercel.app/posts/${postId}`, data);
+      await axios.put(
+        `${process.env.REACT_APP_SERVER_URL}/posts/${postId}`,
+        data
+      );
       toast.success("Updated post successfully!");
       hideModalEdit();
       dispatch(toggleUpdate(!isUpdate));
@@ -116,7 +120,7 @@ const EditModalContent = ({
     async function getPost() {
       try {
         const res = await axios.get(
-          `https://serversocial.vercel.app/posts/${postId}`
+          `${process.env.REACT_APP_SERVER_URL}/posts/${postId}`
         );
         setPost(res.data);
       } catch (error) {
@@ -165,8 +169,8 @@ const EditModalContent = ({
             <div className=" h-[490px] max-h-full  overflow-y-auto flex flex-col justify-between gap-y-2   w-full max-w-[350px]">
               <div className="p-4 h-[180px] xl:h-[300px] overflow-y-auto shrink-0 flex flex-col gap-y-3">
                 <div className="flex items-center gap-x-2">
-                  <img
-                    src={
+                  <ImageLazy
+                    url={
                       user?.profilePicture?.thumb ||
                       "https://i.ibb.co/1dSwFqY/download-1.png"
                     }

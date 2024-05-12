@@ -1,111 +1,90 @@
-import axios from "axios";
-import { useAuth } from "components/context/Auth-Context";
-import Loading from "components/loading/Loading";
 import ItemPost from "components/post/ItemPost";
-import { setIsReload, setShowLoading } from "components/redux/globalSlice";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import { v4 } from "uuid";
 import NotPost from "./NotPost";
+import LoadingSkeleton from "components/loading/LoadingSkeleton";
+import { useSelector } from "react-redux";
+import ButtonLoadMore from "components/button/ButtonLoadMore";
+import { getDataApi } from "utils/fetchData";
+import { PROFILE_TYPES } from "components/redux/actions/profileAction";
 
-const ProfilePosts = ({ socket }) => {
-  const dispatch01 = useDispatch();
-  const { slug } = useParams();
-  const [posts, setPosts] = useState([]);
-  const [myUser, setMyUser] = useState([]);
-  const { user: currentUser, dispatch } = useAuth();
-  const [numberItem, setNumberItem] = useState(6);
-
-  const { isLoading, isUpdate, isReload } = useSelector(
-    (state) => state.global
-  );
-  useEffect(() => {
-    async function getPostsOfUser() {
-      try {
-        dispatch01(setShowLoading(true));
-        const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/posts/profile/` + slug
-        );
-        dispatch01(setShowLoading(false));
-        dispatch01(setIsReload(false));
-
-        setPosts(res.data);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getPostsOfUser();
-    // here
-  }, [dispatch01, isUpdate, slug, isReload]);
+const ProfilePosts = ({ user, id, dispatch, profile }) => {
+  const [postsData, setPostsData] = useState([]);
+  const [load, setLoad] = useState(false);
+  const [page, setPage] = useState(0);
+  const [result, setResult] = useState(9);
+  const {
+    posts: { posts },
+  } = useSelector((state) => state);
 
   useEffect(() => {
-    async function getUser() {
-      try {
-        const userBig = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/users?userId=${currentUser._id}`
-        );
-        setMyUser(userBig.data);
-      } catch (error) {
-        console.log(error);
+    profile.posts.forEach((data) => {
+      if (data._id === id) {
+        if (posts.userId === id) {
+          setPostsData([...data.posts, ...posts]);
+        } else {
+          setPostsData(data.posts);
+        }
+        setResult(data.result);
+        setPage(data.page);
       }
-    }
-    getUser();
-  }, [currentUser]);
-  const handleLoadMore = () => {
-    setNumberItem(numberItem + 6);
+    });
+  }, [id, posts, profile.posts]);
+  const handleLoadMore = async () => {
+    setLoad(true);
+    const res = await getDataApi(`users_post/${id}?limit=${page * 9}`);
+    dispatch({
+      type: PROFILE_TYPES.GET_POSTS,
+      payload: { ...res.data, page: page + 1, _id: id },
+    });
+    setLoad(false);
   };
+
   return (
-    <>
-      {isLoading && (
-        <div className="w-full  h-full flex">
-          <Loading className="w-[50px] h-[50px] mx-auto"></Loading>
-        </div>
-      )}
-
-      <div className="content mt-auto outlet  w-full h-full">
-        <div className="w-full  flex  my-10  pb-12">
-          {!isLoading &&
-            posts.length === 0 &&
-            (myUser._id !== currentUser._id ? (
-              <>
-                <NotPost notPhoto></NotPost>
-              </>
-            ) : (
-              <NotPost></NotPost>
-            ))}
-
-          <div className="w-full grid grid-cols-3 gap-5 ">
-            {posts.length > 0 &&
-              posts
-                .slice(0, numberItem)
-                .map((post) => (
-                  <ItemPost
-                    key={post._id}
-                    socket={socket}
-                    post={post}
-                  ></ItemPost>
-                ))}
-            {/* <ItemPost></ItemPost>
-            <ItemPost></ItemPost>
-            <ItemPost></ItemPost>
-            <ItemPost></ItemPost>
-            <ItemPost></ItemPost>
-            <ItemPost></ItemPost> */}
-          </div>
-        </div>
-        <div className="w-full flex mb-7">
-          {posts.length > 6 && numberItem < posts.length && (
-            <button
-              onClick={handleLoadMore}
-              className="p-3 inline-block rounded-lg text-white bg-blue-500 mx-auto "
-            >
-              Load More
-            </button>
+    <div className="w-full h-full mt-auto  outlet">
+      <div className="flex flex-col w-full mx-auto my-5 ">
+        <>
+          {profile.loading && (
+            <img
+              src="/logoHome.png"
+              className="w-[35px] m-auto  h-[35px] object-cover animate-spin"
+              alt="/logoHome.png"
+            ></img>
           )}
+          {!profile.loading && postsData?.length === 0 && user._id === id && (
+            <NotPost></NotPost>
+          )}
+          {!profile.loading && postsData?.length === 0 && user._id !== id && (
+            <NotPost notPhoto></NotPost>
+          )}
+        </>
+        <div className="grid w-full grid-cols-3 gap-5 ">
+          {profile.loading && (
+            <>
+              {postsData.length > 0 &&
+                postsData.map((item) => (
+                  <LoadingSkeleton
+                    key={item._id}
+                    height="250px"
+                  ></LoadingSkeleton>
+                ))}
+            </>
+          )}
+          {!profile.loading &&
+            postsData.length > 0 &&
+            postsData.map((post) => (
+              <ItemPost key={post._id} post={post}></ItemPost>
+            ))}
         </div>
       </div>
-    </>
+      <div className="">
+        <ButtonLoadMore
+          page={page}
+          result={result}
+          handleLoadMore={handleLoadMore}
+          load={load}
+        ></ButtonLoadMore>
+      </div>
+    </div>
   );
 };
 

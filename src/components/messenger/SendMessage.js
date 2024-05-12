@@ -118,7 +118,16 @@ const SendMessage = ({
     files.forEach((file) => {
       if (!file) return toast.error("File does not exist.");
       if (file.size > 1024 * 1024 * 5)
-        return toast.error("Image/video largest is 5mb.");
+        return toast.error("Image/video largest is 5mb.", {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
 
       arrImg.push(file);
     });
@@ -143,7 +152,7 @@ const SendMessage = ({
       });
     });
     return () => {
-      socket.current.disconnect();
+      // socket.current.disconnect();
     };
   }, [arrImage, setArrivalMessages, socket]);
   return (
@@ -162,7 +171,7 @@ const SendMessage = ({
       ></textarea>
       <div className="flex items-center gap-x-2  w-full max-w-[80px] justify-between ">
         {reviewImage.imageMes && (
-          <div className="imgReview relative flex-1">
+          <div className="relative flex-1 imgReview">
             <img
               src={reviewImage.imageMes}
               className="w-[35px] h-[35px] object-cover rounded-xs"
@@ -220,7 +229,7 @@ const SendMessage = ({
         </>
       ) : (
         <>
-          <p className="none-focus cursor-pointer px-2">
+          <p className="px-2 cursor-pointer none-focus">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

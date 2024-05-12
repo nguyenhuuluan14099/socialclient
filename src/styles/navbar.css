@@ -1,0 +1,12 @@
+@media screen and (min-width: 1024px) {
+  :root {
+    --navbar-medium-width: 250px;
+  }
+  .navbar {
+    width: var(--navbar-medium-width);
+  }
+  .content {
+    width: calc(100% - var(--navbar-medium-width));
+    margin-left: var(--navbar-medium-width);
+  }
+}

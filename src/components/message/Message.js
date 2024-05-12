@@ -1,90 +1,72 @@
-import axios from "axios";
-import { useAuth } from "components/context/Auth-Context";
 import IconBtnDots from "components/icons/IconBtnDots";
 import ModalBase from "components/modal/ModalBase";
-import { setReloadMes } from "components/redux/globalSlice";
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-// import { format } from "timeago.js";
 import { format } from "date-fns";
 import ImageLazy from "components/image/ImageLazy";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteMessage } from "components/redux/actions/messageAction";
 
-const Message = ({ own = false, message, yourFriend, myUser }) => {
+const Message = ({ message, data, id, user }) => {
+  const { auth, socket } = useSelector((state) => state);
   const [showValid, setShowValid] = useState(false);
-  const [showDate, setShowDate] = useState(false);
-  const { reloadMes } = useSelector((state) => state.global);
   const dispatch = useDispatch();
-  const handleDeleteMessage = async (id) => {
-    try {
-      await axios.delete(`${process.env.REACT_APP_SERVER_URL}/messages/${id}`);
-      dispatch(setReloadMes(!reloadMes));
-      // setMessages(messages.filter(mes => mes.id !== id))
-    } catch (error) {
-      console.log(error);
+  const handleDeleteMessage = () => {
+    if (data) {
+      dispatch(deleteMessage({ data, msg: message, auth, socket, id }));
+      setShowValid(false);
     }
   };
-  const { user } = useAuth();
-
   return (
     <div className="dark:text-white">
       <div
         className={` flex mx-3 message-text    gap-x-2 my-3 ${
-          own ? " flex-row-reverse" : ""
+          message.sender === auth.user._id ? " flex-row-reverse" : ""
         }`}
       >
-        <ImageLazy
-          url={
-            (own
-              ? myUser?.profilePicture?.thumb
-              : yourFriend?.profilePicture?.thumb) ||
-            "https://i.ibb.co/1dSwFqY/download-1.png"
+        <img
+          alt="user"
+          src={
+            message.sender === auth.user._id
+              ? auth.user.profilePicture[0].imageThumb
+              : user[0]?.profilePicture[0].imageThumb
           }
           className="w-[30px] h-[30px] rounded-full object-cover"
         />
         <div
-          className={` flex dark:text-white   flex-col ${
-            own ? "items-end" : ""
+          className={`h-full flex dark:text-white   flex-col ${
+            message.sender === auth.user._id ? "items-end" : ""
           } -z-6`}
         >
           <div
-            className={`dark:text-white max-w-[300px] border dark:border-[#262626]  relative   group px-3  py-2 rounded-lg flex flex-col ${
-              own
+            className={`dark:text-white h-full  border dark:border-[#262626]  relative   group px-3  py-2 rounded-lg flex flex-col gap-3 ${
+              message.sender === auth.user._id
                 ? "bg-[#EFEFEF] dark:bg-[#262626]   text-[#262626] "
                 : " text-[#262626] dark:bg-black   bg-white"
             }`}
           >
-            {message.imageMes && (
-              <ImageLazy
-                width="100%"
-                height="100%"
-                url={message.imageMes.url}
-                className="object-cover rounded-lg w-full h-full"
-              />
-            )}
-            <div className={` ${own ? "ml-auto" : "mr-auto"} `}>
-              <div className="dark:text-white flex flex-col">
-                <p>{message?.text}</p>
-                <div
-                  className={`text-slate-400  dark:text-slate-500 ${
-                    own ? "ml-auto" : "mr-auto"
-                  }   text-[10px] italic`}
-                >
-                  {/* {format(message?.createdAt)} */}
-
-                  <div
-                    onClick={() => setShowDate(!showDate)}
-                    title={format(new Date(message?.createdAt), "dd/MM/yyyy")}
-                  >
-                    {format(new Date(message?.createdAt), "HH:mm")}
-                    {showDate &&
-                      format(new Date(message?.createdAt), "--dd/MM/yyyy")}
-                  </div>
+            {message.media &&
+              message.media.map((media) => (
+                <div key={media.imageId}>
+                  <img
+                    src={media.imageThumb}
+                    alt="imageMess"
+                    className=" w-[250px] rounded-lg"
+                  />
                 </div>
+              ))}
+            <div
+              className={` ${
+                message.sender === auth.user._id ? "ml-auto" : "mr-auto"
+              } `}
+            >
+              <div className="flex flex-col dark:text-white">
+                <p>{message.text}</p>
               </div>
             </div>
+
             <div
               className={`absolute invisible   right-full  cursor-pointer top-2/4 flex items-center justify-between -translate-y-2/4 p-1 w-[200px] h-full ${
-                message.sender === user._id ? "group-hover:visible" : ""
+                message.sender === auth.user._id ? "group-hover:visible" : ""
               }`}
             >
               <div></div>
@@ -96,14 +78,24 @@ const Message = ({ own = false, message, yourFriend, myUser }) => {
               </div>
             </div>
           </div>
+
+          <div
+            className={`text-slate-400  dark:text-slate-500 ${
+              message.sender === auth.user._id ? "ml-auto" : "mr-auto"
+            }   text-[9px] italic`}
+          >
+            {format(new Date(message.createdAt), "dd/MM/yyyy") +
+              "   " +
+              format(new Date(message.createdAt), "HH:mm")}
+          </div>
         </div>
 
         {showValid && (
           <ModalBase visible={showValid} onClose={() => setShowValid(false)}>
-            <div className="w-full cursor-pointer flex flex-col text-center">
+            <div className="flex flex-col w-full text-center cursor-pointer">
               <p
-                onClick={() => handleDeleteMessage(message._id)}
-                className="text-red-500 font-semibold w-full border border-transparent  border-b-slate-300 p-3"
+                onClick={handleDeleteMessage}
+                className="w-full p-3 font-semibold text-red-500 border border-transparent border-b-slate-300"
               >
                 Delete
               </p>

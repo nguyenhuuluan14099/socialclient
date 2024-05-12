@@ -1,8 +1,7 @@
-import { useAuth } from "components/context/Auth-Context";
 import Table from "components/table/Table";
 import TablePost from "components/table/TablePost";
-import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
+import React, { useState } from "react";
+
 import ReactPaginate from "react-paginate";
 
 // Example items, to simulate fetching from another resources.
@@ -45,7 +44,6 @@ export function PaginatedItems({ data, itemsPerPage }) {
     // );
     setItemOffset(newOffset);
   };
-  if (!data) return;
   return (
     <>
       <ReactPaginate

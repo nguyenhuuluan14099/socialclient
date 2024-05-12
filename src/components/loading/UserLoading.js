@@ -1,7 +1,7 @@
 import React from "react";
 import LoadingSkeleton from "./LoadingSkeleton";
 
-const UserLoading = (props) => {
+const UserLoading = ({ profile = false }) => {
   return (
     <div className="flex my-3 items-center justify-between">
       <div className="flex  items-center gap-x-2">
@@ -15,7 +15,7 @@ const UserLoading = (props) => {
           <LoadingSkeleton width="150px" height="15px"></LoadingSkeleton>
         </div>
       </div>
-      {!props.profile && (
+      {profile && (
         <LoadingSkeleton width="80px" height="30px"></LoadingSkeleton>
       )}
     </div>

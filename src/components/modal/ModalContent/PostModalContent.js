@@ -1,68 +1,36 @@
-import axios from "axios";
-import { setIsReload } from "components/redux/globalSlice";
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
 import ModalBase from "../ModalBase";
 import EditModalContent from "./EditModalContent";
+import { deletePost } from "components/redux/actions/postAction";
 
 const PostModalContent = ({ onClose = () => {}, ...rest }) => {
   const { userId, currentUserId, postId } = rest;
-  // console.log("postId", postId);
-  // console.log("userId", userId);
   const [demoHide, setDemoHide] = useState(false);
   const [permission, setPermission] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [modalValid, setModalValid] = useState(false);
-
+  const { socket, auth } = useSelector((state) => state);
   const dispatch = useDispatch();
-  const handleClick = () => {
-    onClose();
-    // dispatch(toggleUpdate(!isUpdate));
-  };
-
   const cancelRef = useRef();
-  const hideModalEdit = () => {
-    setTimeout(() => {
-      setShowModalEdit(false);
-      setDemoHide(true);
-    }, 500);
-  };
-  useEffect(() => {
-    if (userId === currentUserId) {
-      setPermission(true);
-    } else {
-      setPermission(false);
-    }
-    if (demoHide) {
-      cancelRef.current.click();
-    }
-  }, [currentUserId, userId, demoHide]);
 
   const handleDeletePost = async () => {
-    try {
-      await axios.delete(`${process.env.REACT_APP_SERVER_URL}/posts/${postId}`);
-      toast.success("Delete post successfully!");
-      setModalValid(false);
-      dispatch(setIsReload(true));
-    } catch (error) {
-      console.log(error);
-    }
+    dispatch(deletePost({ postId, socket, token: auth.token }));
   };
 
   let style = `last:border-none last:rounded-lg first:rounded-lg text-[15px] active:bg-slate-200 transition-all  border-transparent border border-b-gray-300 ]`;
 
-  useEffect(() => {
-    if (showModalEdit) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "visible";
-    }
-  }, [showModalEdit]);
+  // useEffect(() => {
+  //   if (showModalEdit) {
+  //     document.body.style.overflow = "hidden";
+  //   } else {
+  //     document.body.style.overflow = "visible";
+  //   }
+  // }, [showModalEdit]);
   return (
     <div className="text-center cursor-pointer ">
-      {permission ? (
+      {userId === currentUserId ? (
         <>
           <div
             onClick={() => setModalValid(true)}
@@ -90,7 +58,7 @@ const PostModalContent = ({ onClose = () => {}, ...rest }) => {
       </Link>
       <div
         ref={cancelRef}
-        onClick={handleClick}
+        onClick={onClose}
         className={`${style} text-slate-600 dark:text-white border border-t-slate-300`}
       >
         <p className="py-3">Cancel</p>
@@ -104,7 +72,7 @@ const PostModalContent = ({ onClose = () => {}, ...rest }) => {
         >
           <EditModalContent
             onClose={() => setShowModalEdit(false)}
-            hideModalEdit={hideModalEdit}
+            hideModalEdit={onClose}
             showModal={showModalEdit}
             postId={postId}
           ></EditModalContent>
@@ -112,19 +80,19 @@ const PostModalContent = ({ onClose = () => {}, ...rest }) => {
       )}
       {modalValid && (
         <ModalBase visible={modalValid} onClose={() => setModalValid(false)}>
-          <div className="flex items-center text-center flex-col w-full">
-            <p className="p-3 border w-full  border-transparent border-b-slate-300 text-lg font-bold">
+          <div className="flex flex-col items-center w-full text-center">
+            <p className="w-full p-3 text-lg font-bold border border-transparent border-b-slate-300">
               Confirm delete post?
             </p>
             <p
               onClick={handleDeletePost}
-              className="p-3  w-full  border cursor-pointer border-transparent border-b-slate-300 text-red-500 font-semibold"
+              className="w-full p-3 font-semibold text-red-500 border border-transparent cursor-pointer border-b-slate-300"
             >
               Delete
             </p>
             <p
               onClick={() => setModalValid(false)}
-              className="p-3 w-full   cursor-pointer"
+              className="w-full p-3 cursor-pointer"
             >
               Cancel
             </p>

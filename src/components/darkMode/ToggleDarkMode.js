@@ -1,25 +1,21 @@
-import { useAuth } from "components/context/Auth-Context";
 import useDarkMode from "components/hooks/useDarkMode";
-import React, { memo, useEffect } from "react";
+import React, { memo } from "react";
 
 const ToggleDarkMode = ({ hide = false }) => {
-  // const [darkMode, setDarkMode] = useDarkMode();
-  const { darkMode, dispatch } = useAuth();
-
+  const [darkMode, setDarkMode] = useDarkMode();
   const handleToggleDarkMode = () => {
-    dispatch({
-      type: "TOGGLE_DARKMODE",
-      payload: !darkMode,
-    });
+    setDarkMode(!darkMode);
   };
+
   return (
     <div
+      hidden={hide}
       onClick={handleToggleDarkMode}
       className={`flex items-center hover:bg-slate-100 transition-all last:border-none justify-between p-3 border border-transparent dark:bg-black dark:hover:bg-[#262626] border-b-slate-300 dark:border-[#262626] ${
-        hide ? "invisible" : "visible"
+        hide ? "invisible fixed" : "visible"
       }`}
     >
-      <p className="text-[14px]">Switch appearance</p>
+      <p className="text-[14px]">{darkMode ? "DarkMode" : "LightMode"}</p>
       <span>
         {darkMode ? (
           <svg

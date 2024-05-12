@@ -1,6 +1,6 @@
 import React from "react";
 
-const IconMes = () => {
+const IconMes = ({ className = "" }) => {
   return (
     <span className="">
       <svg
@@ -9,7 +9,7 @@ const IconMes = () => {
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
-        className="w-7 h-7"
+        className={`w-7 h-7 ${className}`}
       >
         <path
           strokeLinecap="round"

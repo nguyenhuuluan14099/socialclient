@@ -2,7 +2,7 @@ import React from "react";
 
 const NotPost = ({ notPhoto = false }) => {
   return (
-    <div className="mx-auto flex flex-col items-center p-3 gap-y-3 ml-[150px]   w-full max-w-[450px]">
+    <div className="mx-auto flex flex-col items-center p-3 gap-y-5    w-[450px]">
       <span className=" rounded-full  w-[60px] h-[60px]">
         <svg
           xmlns="http://www.w3.org/2000/svg"

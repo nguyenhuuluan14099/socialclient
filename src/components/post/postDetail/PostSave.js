@@ -1,55 +1,46 @@
-import axios from "axios";
-import { useAuth } from "components/context/Auth-Context";
 import IconSave from "components/icons/IconSave";
 import IconSaved from "components/icons/IconSaved";
+import { savedPost, unSavedPost } from "components/redux/actions/postAction";
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const PostSave = ({ post }) => {
-  const [loading, setLoading] = useState(false);
+  const { auth } = useSelector((state) => state);
   const [saved, setSaved] = useState(false);
-  const { user: currentUser } = useAuth();
+  const [savedPosts, setSavedPosts] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    setSaved(currentUser?.saved?.includes(post._id));
-  }, [currentUser.saved, post._id]);
-  const handleSavedPost = async () => {
-    try {
-      setLoading(true);
-      await axios.put(
-        `${process.env.REACT_APP_SERVER_URL}/posts/saved/${post._id}`,
-        {
-          userId: currentUser._id,
-        }
-      );
-
-      setSaved(!saved);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
+    if (auth.user.saved.find((id) => id === post._id)) {
+      setSaved(true);
+    } else {
+      setSaved(false);
     }
+  }, [post._id, auth.user.saved]);
+
+  const handleSavedPost = async () => {
+    if (savedPosts) return;
+    setSavedPosts(true);
+    dispatch(savedPost({ post, auth }));
+    setSavedPosts(false);
+  };
+
+  const handleUnSavedPost = async () => {
+    if (savedPosts) return;
+    setSavedPosts(true);
+    dispatch(unSavedPost({ post, auth }));
+    setSavedPosts(false);
   };
 
   return (
     <div>
-      {loading === true && (
-        <div className="w-6    h-6   rounded-full  border-blue-500 border-2 border-t-transparent  animate-spin"></div>
-      )}
-      {!saved && (
-        <>
-          {loading === false && (
-            <IconSaved onClick={handleSavedPost}></IconSaved>
-          )}
-        </>
-      )}
-      {saved && (
-        <>
-          {loading === false && (
-            <IconSave
-              onClick={handleSavedPost}
-              className="dark:text-white"
-            ></IconSave>
-          )}
-        </>
+      {saved ? (
+        <IconSaved
+          className="text-blue-600"
+          onClick={handleUnSavedPost}
+        ></IconSaved>
+      ) : (
+        <IconSave onClick={handleSavedPost} className=""></IconSave>
       )}
     </div>
   );

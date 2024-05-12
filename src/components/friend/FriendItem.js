@@ -1,10 +1,9 @@
-import axios from "axios";
-import { useAuth } from "components/context/Auth-Context";
 import ImageUser from "components/image/ImageUser";
 
-import React, { memo, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import FollowBlock from "./FollowBlock";
+import { useSelector } from "react-redux";
 
 const FriendItem = ({
   data,
@@ -12,13 +11,12 @@ const FriendItem = ({
   info = "Suggested for you",
   classNameImg = "",
   story = false,
-  username,
+  fullname,
 }) => {
-  console.log("re-render");
-  if (!data) return;
+  const { auth } = useSelector((state) => state);
   return (
-    <div className="info flex items-center justify-between dark:text-white">
-      <div className="flex items-center gap-x-3 cursor-pointer">
+    <div className="flex items-center justify-between info dark:text-white">
+      <div className="flex items-center cursor-pointer gap-x-3">
         <ImageUser
           smallImg={smallImg}
           data={data}
@@ -30,8 +28,8 @@ const FriendItem = ({
             story ? "" : "translate-x-[5px]"
           } flex flex-col  text-slate-600 dark:text-white`}
         >
-          <Link to={`/${data.username}`} className="text-[13px] font-semibold">
-            {data?.username || username}
+          <Link to={`/${data._id}`} className="text-[13px] font-semibold">
+            {data?.fullname || fullname}
           </Link>
           <p className="text-[13px] text-slate-400">{info}</p>
         </div>
@@ -47,8 +45,7 @@ const FriendItem = ({
       >
         {children}
       </Link> */}
-
-      <FollowBlock data={data}></FollowBlock>
+      {data._id !== auth.user._id && <FollowBlock data={data}></FollowBlock>}
     </div>
   );
 };

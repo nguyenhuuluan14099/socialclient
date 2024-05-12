@@ -1,12 +1,17 @@
-import axios from "axios";
-import { AuthProvider, useAuth } from "components/context/Auth-Context";
 import "react-toastify/dist/ReactToastify.css";
-import React, { Suspense, useState } from "react";
+import React, { Suspense } from "react";
 import { useEffect } from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
-import { io } from "socket.io-client";
+import { Route, Routes } from "react-router-dom";
 import NotFoundPage from "components/pages/NotFoundPage";
-import GlobalDarkMode from "components/darkMode/GlobalDarkMode";
+import ToggleDarkMode from "components/darkMode/ToggleDarkMode";
+import { useDispatch, useSelector } from "react-redux";
+import { getPosts } from "components/redux/actions/postAction";
+import { socket } from "./socket";
+import SocketClient from "SocketClient";
+import { GLOBAL_TYPES } from "components/redux/actions/globalAction";
+import { getNotifies } from "components/redux/actions/notifyAction";
+import { refreshToken } from "components/redux/actions/authAction";
+
 const DetailPostPage = React.lazy(() =>
   import("components/pages/DetailPostPage")
 );
@@ -35,96 +40,108 @@ const NavBar = React.lazy(() => import("components/layout/NavBar"));
 const Messenger = React.lazy(() => import("components/messenger/Messenger"));
 
 function App() {
-  const [socket, setSocket] = useState(null);
-  const { user } = useAuth();
-  React.useEffect(() => {
-    setSocket(io("https://endsocketne1.onrender.com"));
-    // setSocket(io("ws://localhost:8900"));
-
-    return () => {
-      // socket.disconnect();
-    };
-  }, []);
+  const dispatch = useDispatch();
+  const { auth } = useSelector((state) => state);
 
   useEffect(() => {
-    socket?.emit("addNewUser01", user?.username);
-    socket?.emit("addUser", user?._id);
-  }, [socket, user?.username, user?._id]);
+    dispatch(refreshToken());
 
-  // const navigate = useNavigate();
+    socket.connect();
+    dispatch({ type: GLOBAL_TYPES.SOCKET, payload: socket });
+    return () => {
+      socket.disconnect();
+    };
+  }, [dispatch]);
+
   // useEffect(() => {
-  //   if (!user) {
-  //     navigate("/login");
-  //   }
-  // }, [navigate, user]);
+  //   if (auth?._id) dispatch(getPosts({ id: auth?._id }));
+  // }, [dispatch, auth?._id]);
+
+  useEffect(() => {
+    if (auth.token) {
+      dispatch(getNotifies(auth.token));
+      dispatch(getPosts(auth.token));
+    }
+  }, [dispatch, auth.token]);
+
+  useEffect(() => {
+    if (!("Notification" in window)) {
+      alert("This browser does not support desktop notification");
+    } else if (Notification.permission === "granted") {
+    } else if (Notification.permission !== "denied") {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+        }
+      });
+    }
+  }, []);
 
   return (
-    <AuthProvider>
-      <GlobalDarkMode>
-        <Suspense>
-          <Routes>
-            <Route
-              path="/register"
-              element={<RegisterPage></RegisterPage>}
-            ></Route>
-            <Route path="/login" element={<LogInPage></LogInPage>}></Route>
-            <Route path="*" element={<NotFoundPage></NotFoundPage>}></Route>
-            <Route path="/" element={<NavBar socket={socket}></NavBar>}>
-              <Route
-                path="/post/:slug"
-                element={<DetailPostPage socket={socket}></DetailPostPage>}
-              ></Route>
-              <Route
-                path="/account/edit"
-                element={
-                  <AccountSettingPage socket={socket}></AccountSettingPage>
-                }
-              ></Route>
-              <Route
-                path="/explore"
-                element={<ExplorePage socket={socket}></ExplorePage>}
-              ></Route>
-              <Route
-                path="/explore/people"
-                element={<SuggestPage></SuggestPage>}
-              ></Route>
-              <Route
-                path="/manageSystem"
-                element={<ManageSystemPage socket={socket}></ManageSystemPage>}
-              ></Route>
+    <>
+      <ToggleDarkMode hide></ToggleDarkMode>
+      {auth.token && <SocketClient></SocketClient>}
+      <Suspense>
+        <Routes>
+          <Route
+            path="/register"
+            element={<RegisterPage></RegisterPage>}
+          ></Route>
+          <Route path="/login" element={<LogInPage></LogInPage>}></Route>
 
-              <Route
-                path="/messenger/*"
-                element={<Messenger socketMes={socket}></Messenger>}
-              ></Route>
-              <Route
-                path="/"
-                element={<HomePage socket={socket}></HomePage>}
-              ></Route>
-              {/* <Route
+          <Route
+            path="/"
+            element={auth.token ? <NavBar></NavBar> : <LogInPage></LogInPage>}
+          >
+            <Route
+              path="/post/:slug"
+              element={<DetailPostPage></DetailPostPage>}
+            ></Route>
+            <Route path="*" element={<NotFoundPage></NotFoundPage>}></Route>
+            <Route
+              path="/account/edit"
+              element={<AccountSettingPage></AccountSettingPage>}
+            ></Route>
+            <Route
+              path="/explore"
+              element={<ExplorePage></ExplorePage>}
+            ></Route>
+
+            <Route
+              path="/explore/people"
+              element={<SuggestPage></SuggestPage>}
+            ></Route>
+            <Route
+              path="/manageSystem"
+              element={<ManageSystemPage></ManageSystemPage>}
+            ></Route>
+
+            <Route
+              path="/messenger/*"
+              element={<Messenger></Messenger>}
+            ></Route>
+            <Route path="/" element={<HomePage></HomePage>}></Route>
+            {/* <Route
               
                 element={<ProfileLayout></ProfileLayout>}
               ></Route> */}
-              <Route path="/" element={<HomePage></HomePage>}></Route>
+            <Route path="/" element={<HomePage></HomePage>}></Route>
 
+            <Route
+              path="/:slug/*"
+              // path="/${user.user}/*"
+              element={<ProfileLayout></ProfileLayout>}
+            >
+              <Route path="" element={<ProfilePosts></ProfilePosts>}></Route>
               <Route
-                path="/:slug/*"
-                element={<ProfileLayout socket={socket}></ProfileLayout>}
-              >
-                <Route
-                  path=""
-                  element={<ProfilePosts socket={socket}></ProfilePosts>}
-                ></Route>
-                <Route
-                  path=":slug"
-                  element={<ProfileSaved socket={socket}></ProfileSaved>}
-                ></Route>
-              </Route>
+                path={`:slug/`}
+                // path=":slug"
+                element={<ProfileSaved></ProfileSaved>}
+              ></Route>
             </Route>
-          </Routes>
-        </Suspense>
-      </GlobalDarkMode>
-    </AuthProvider>
+          </Route>
+        </Routes>
+      </Suspense>
+    </>
   );
 }
 

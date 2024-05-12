@@ -3,24 +3,8 @@ import axios from "axios";
 import FriendItem from "components/friend/FriendItem";
 import React, { useEffect, useState } from "react";
 
-const FollowingModalContent = ({ onClose = () => {}, slug }) => {
+const FollowingModalContent = ({ onClose = () => {}, user }) => {
   const [friendFollowing, setFriendFollowing] = useState([]);
-
-  const [user, setUser] = useState([]);
-
-  useEffect(() => {
-    async function getUserInfo() {
-      try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/users?username=${slug}`
-        );
-        setUser(res.data);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getUserInfo();
-  }, [slug]);
   // console.log("user", user);
   useEffect(() => {
     if (!user._id) return;
@@ -37,10 +21,10 @@ const FollowingModalContent = ({ onClose = () => {}, slug }) => {
     fetchUsers();
   }, [user._id]);
   return (
-    <div className="w-full h-full  ">
-      <div className="border border-transparent border-b-slate-300 flex w-full items-center justify-between">
+    <div className="w-full h-full ">
+      <div className="flex items-center justify-between w-full border border-transparent border-b-slate-300">
         <p></p>
-        <p className="ml-5 font-semibold text-lg">Followings</p>
+        <p className="ml-5 text-lg font-semibold">Followings</p>
         <span onClick={onClose} className="p-2 cursor-pointer">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -59,7 +43,7 @@ const FollowingModalContent = ({ onClose = () => {}, slug }) => {
         </span>
       </div>
       <div className="flex flex-col gap-y-3 ">
-        <div className="w-full p-2 border border-transparent border-b-slate-300 flex">
+        <div className="flex w-full p-2 border border-transparent border-b-slate-300">
           <p className="mx-auto ">People</p>
         </div>
         <div className="flex flex-col gap-y-2 p-3 h-[300px] overflow-y-scroll">

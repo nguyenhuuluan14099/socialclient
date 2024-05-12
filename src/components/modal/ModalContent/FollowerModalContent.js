@@ -1,46 +1,28 @@
-import axios from "axios";
 import FriendItem from "components/friend/FriendItem";
 import IconFollowerPage from "components/icons/IconFollowerPage";
 import React, { useEffect, useState } from "react";
 
-const FollowerModalContent = ({ onClose = () => {}, slug }) => {
-  const [friendFollowers, setFriendFollowers] = useState([]);
-  const [user, setUser] = useState([]);
-
+const FollowerModalContent = ({
+  onClose = () => {},
+  user,
+  follower = false,
+}) => {
+  const [listUser, setListUser] = useState([]);
   useEffect(() => {
-    async function getUserInfo() {
-      try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/users?username=${slug}`
-        );
-        setUser(res.data);
-      } catch (error) {
-        console.log(error);
-      }
+    if (follower) {
+      setListUser(user.followers);
+    } else {
+      setListUser(user.followings);
     }
-    getUserInfo();
-  }, [slug]);
-
-  useEffect(() => {
-    if (!user._id) return;
-    async function fetchUsers() {
-      try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/users/friendFollower/` + user._id
-        );
-        setFriendFollowers(res.data);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetchUsers();
-  }, [user._id]);
-
+  }, [follower, user.followers, user.followings]);
+  if (!user) return;
   return (
-    <div className="w-full h-full  ">
-      <div className="border border-transparent border-b-slate-300 flex w-full items-center justify-between">
+    <div className="w-full h-full ">
+      <div className="flex items-center justify-between w-full border border-transparent border-b-slate-300">
         <p></p>
-        <p className="ml-5 font-semibold text-lg">Followers</p>
+        <p className="ml-5 text-lg font-semibold">
+          {follower ? "Followers" : "Followings"}
+        </p>
         <span onClick={onClose} className="p-2 cursor-pointer">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -58,10 +40,11 @@ const FollowerModalContent = ({ onClose = () => {}, slug }) => {
           </svg>
         </span>
       </div>
-      <div className="flex flex-col gap-y-3 h-[400px]  overflow-y-scroll">
-        {friendFollowers.length > 0 ? (
-          <div className="p-3 flex flex-col gap-y-3">
-            {friendFollowers.map((data) => (
+
+      <div className="flex flex-col  h-[400px]  overflow-y-scroll">
+        {listUser.length > 0 ? (
+          <div className="flex flex-col p-3 gap-y-3">
+            {listUser.map((data) => (
               <FriendItem story key={data._id} data={data} type="follow">
                 View Profile
               </FriendItem>
@@ -69,9 +52,9 @@ const FollowerModalContent = ({ onClose = () => {}, slug }) => {
           </div>
         ) : (
           <>
-            <div className="w-full mx-auto items-center p-3 flex flex-col gap-y-1">
+            <div className="flex flex-col items-center w-full p-3 mx-auto gap-y-1">
               <IconFollowerPage></IconFollowerPage>
-              <p className="font-bold text-2xl">Followers</p>
+              <p className="text-2xl font-bold">Followers</p>
               <p className="text-slate-400">
                 You'll see all the people who follow you here.
               </p>

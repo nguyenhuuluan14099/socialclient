@@ -9,14 +9,11 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import ReactPaginate from "react-paginate";
 import { PaginatedItems } from "components/pagination/Pagination";
-import Table from "components/table/Table";
-import { useAuth } from "components/context/Auth-Context";
 import axios from "axios";
+import { getDataApi } from "utils/fetchData";
 import { useSelector } from "react-redux";
-import Header from "components/header/Header";
-const { faker } = require("@faker-js/faker");
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -71,50 +68,34 @@ export const data = {
   ],
 };
 
-const ManageSystemPage = ({ socket }) => {
+const ManageSystemPage = () => {
   const [users, setUsers] = useState([]);
   const [posts, setPosts] = useState([]);
-  const { isReload } = useSelector((state) => state.global);
+  const { auth } = useSelector((state) => state);
 
-  const { user } = useAuth();
   useEffect(() => {
-    if (!user) return;
-    async function getUser() {
+    async function getData() {
       try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/users/listUser/${user._id}`
-        );
-        setUsers(res.data);
+        const res = await getDataApi("postsByAdmin", auth.token);
+        const resUser = await getDataApi("usersByAdmin", auth.token);
+        setPosts(res.data.posts);
+        setUsers(resUser.data.users);
       } catch (error) {
         console.log(error);
       }
     }
-    getUser();
-  }, [user, user._id]);
-  useEffect(() => {
-    async function getPosts() {
-      try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/posts/listPost/${user._id}`
-        );
-        setPosts(res.data);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getPosts();
-  }, [user._id, isReload]);
-  // console.log("user", users);
-  if (user.isAdmin === false)
+    getData();
+  }, [auth.token]);
+
+  if (auth.user.isAdmin === false)
     return (
-      <div className="text-xl font-bold mx-auto">
+      <div className="text-xl font-bold  mt-16">
         You don't have permission to access this page
       </div>
     );
-  if (!user) return;
+
   return (
     <>
-      <Header socket={socket}></Header>
       <div className="container mt-16">
         <div className="w-full flex items-center gap-x-10 flex-col">
           <div className="flex flex-col gap-y-2">

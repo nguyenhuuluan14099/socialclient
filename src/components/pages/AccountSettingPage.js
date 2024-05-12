@@ -1,44 +1,28 @@
-import axios from "axios";
 import { Button } from "components/button";
-import { imgbbAPI } from "components/config/config";
-import { useAuth } from "components/context/Auth-Context";
-import ImageUpload from "components/image/ImageUpload";
 import Input from "components/input";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 import Header from "components/header/Header";
 import ImageLazy from "components/image/ImageLazy";
+import TextArea from "components/textarea/TextArea";
+import { checkImage, imageUpload } from "components/image/imageUploadMes";
+import { toastContent } from "components/toast/toast";
+import { putDataApi } from "utils/fetchData";
+import { useDispatch, useSelector } from "react-redux";
+import { GLOBAL_TYPES } from "components/redux/actions/globalAction";
+// import { AUTH_TYPES } from "components/redux/actions/authAction";
 
-const AccountSettingPage = ({ socket }) => {
+const AccountSettingPage = () => {
   const [reviewImage, setReviewImage] = useState("");
-  const [progress, setProgress] = useState(0);
-  // const [currentUser, setCurrentUser] = useState([]);
-  const [changePassword, setChangePassword] = useState(false);
-  const { user, dispatch } = useAuth();
-  // console.log("userhere", user);
-  const demo = yup.object({});
+  const [avatar, setAvatar] = useState(null);
+  const { auth } = useSelector((state) => state);
+  const dispatch = useDispatch();
+
   const schema = yup.object({
-    username: yup.string().required("Please enter your username"),
-    currentPassword: yup
-      .string()
-      .matches(/.{8,}/, {
-        message: "Password at least 8 character",
-      })
-      .required("Please enter your password"),
-    password: yup
-      .string()
-      .matches(/.{8,}/, {
-        message: "Password at least 8 character",
-      })
-      .required("Please enter your password"),
-    confirmNewPassword: yup
-      .string()
-      .oneOf([yup.ref("password"), null], "Passwords must match")
-      .required("Please enter your password"),
+    fullname: yup.string().required("Please enter your fullname"),
   });
   const {
     control,
@@ -48,106 +32,75 @@ const AccountSettingPage = ({ socket }) => {
     formState: { isSubmitting, errors },
   } = useForm({
     mode: "onBlur",
-    resolver: yupResolver(changePassword ? schema : demo),
+    resolver: yupResolver(schema),
   });
 
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       const res = await axios.get(
-  //         `${process.env.REACT_APP_SERVER_URL}/users/${user._id}`
-  //       );
-  //       setCurrentUser(res.data);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  //   fetchData();
-  // }, [user._id]);
-
-  useEffect(() => {
-    const arrayError = Object.values(errors);
-    if (arrayError.length > 0) {
-      toast.error(arrayError[0]?.message, {
-        pauseOnHover: false,
-        delay: 0,
-      });
-    }
-  }, [errors]);
   const handleUpdate = async (values) => {
-    if (!user._id) return;
-    const data = {
-      userId: user._id,
-      username: values.username.toLowerCase(),
-      profilePicture: values.image_post,
+    let imgArr = [];
+
+    if (avatar) {
+      imgArr = await imageUpload([avatar]);
+      setValue("profilePicture", imgArr);
+    } else {
+      setValue("profilePicture", auth.user.profilePicture);
+    }
+
+    const newUser = {
+      fullname: values.fullname.toLowerCase(),
       desc: values.desc,
       city: values.city.toLowerCase(),
-      password: values?.password,
-      currentPassword: values?.currentPassword,
+      profilePicture: values.profilePicture,
     };
+
+    const validData =
+      newUser.fullname === auth.user.fullname &&
+      newUser.profilePicture[0].imageId ===
+        auth.user.profilePicture[0].imageId &&
+      newUser.desc === auth.user.desc &&
+      newUser.city === auth.user.city;
+
+    if (validData) return;
     try {
-      await axios.put(`${process.env.REACT_APP_SERVER_URL}/users/`, data);
+      const res = await putDataApi("user", newUser, auth.token);
+
       dispatch({
-        type: "UPDATE_USER",
-        username: data.username,
-        desc: data.desc,
-        city: data.city,
-        profilePicture: data.profilePicture,
+        type: GLOBAL_TYPES.AUTH,
+        payload: { ...auth, user: { ...auth.user, ...newUser } },
       });
-      toast.success("updated user successfully");
-      // window.location.reload();
+      toast.success(res.data.msg, toastContent());
     } catch (error) {
-      toast.error(error?.response?.data, {
-        autoClose: 2000,
-      });
+      toast.error(error.response.data.msg, toastContent());
     }
   };
 
   useEffect(() => {
     reset({
-      username: user?.username,
-      img_post: user?.profilePicture,
-      desc: user?.desc || "",
-      city: user?.city || "",
+      fullname: auth.user.fullname,
+      profilePicture: auth.user.profilePicture,
+      desc: auth.user.desc,
+      city: auth.user.city,
     });
-  }, [user, reset]);
-  const handleUploadImage = async (e) => {
-    const file = e.target.files;
-    if (!file) return;
-    const bodyFormData = new FormData();
-    bodyFormData.append("image", file[0]);
-    const response = await axios({
-      method: "post",
-      url: `${imgbbAPI}`,
-      data: bodyFormData,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      onUploadProgress: (data) => {
-        //Set the progress value to show the progress bar
-        setProgress(Math.round((100 * data.loaded) / data.total));
-      },
-    });
-    const imgData = response.data.data;
-    setReviewImage(imgData?.url);
-    if (!imgData) {
-      console.log("can not fine your image");
+  }, [auth.user, reset]);
+
+  const handleChangeImage = async (e) => {
+    const images = e.target.files[0];
+    const err = checkImage(images);
+    images.reviewImage = window.URL.createObjectURL(images);
+    setReviewImage(images.reviewImage);
+    if (err) {
+      toast.error(err, toastContent());
     }
-    const objectImg = {
-      thumb: imgData.thumb.url,
-      url: imgData.url,
-    };
-    setValue("image_post", objectImg);
+    setAvatar(images);
   };
-  const navigate = useNavigate();
+
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [navigate, user]);
+    return () => {
+      if (reviewImage) window.URL.revokeObjectURL(reviewImage);
+    };
+  }, [reviewImage]);
+
   return (
     <>
-      <Header socket={socket}></Header>
       <div className=" py-5 mt-16 w-full max-w-[900px] ">
         <div className="border p-3 border-slate-300 rounded-[4px] flex flex-col gap-y-3">
           <p className="text-[25px] m-5">Edit profile</p>
@@ -155,117 +108,52 @@ const AccountSettingPage = ({ socket }) => {
             <div className="w-full max-w-[500px]  flex flex-col  gap-y-3 mx-auto">
               <div className="flex items-center justify-between w-full mx-auto max-w-[350px]">
                 <div className="w-[80px] relative h-[80px] flex items-center justify-center rounded-full ">
-                  {reviewImage ? (
-                    <ImageLazy
-                      url={reviewImage}
-                      alt=""
-                      className="w-[80px] h-[80px] object-cover rounded-full"
-                    />
-                  ) : (
+                  {
                     <ImageLazy
                       url={
-                        user?.profilePicture?.thumb ||
-                        "https://i.ibb.co/1dSwFqY/download-1.png"
+                        reviewImage || auth.user.profilePicture[0].imageThumb
                       }
                       alt=""
                       className="w-[80px] h-[80px] object-cover rounded-full"
                     />
-                  )}
-                  {progress !== 0 && !reviewImage && (
-                    <div className="w-[30px] h-[30px] absolute  rounded-full border-[3px] border-blue-500 border-t-transparent animate-spin "></div>
-                  )}
+                  }
                 </div>
-                {/* {!reviewImage && (
-                <div className="w-[30px] h-[30px] rounded-full border-[3px] border-blue-500 border-t-transparent animate-spin"></div>
-              )} */}
+
                 <div>
                   <Input
                     control={control}
-                    name="username"
-                    placeholder="username"
+                    name="fullname"
+                    placeholder="fullname"
                     className=""
                   ></Input>
                   <input
                     accept="image/png, image/gif, image/jpeg"
                     id="imageEdit"
                     type="file"
-                    onChange={handleUploadImage}
+                    onChange={handleChangeImage}
                     className="hidden"
                   />
                   <div className="">
                     <label
                       htmlFor="imageEdit"
-                      className="text-blue-500 cursor-pointer transition-all font-semibold hover:text-blue-400"
+                      className="font-semibold text-blue-500 transition-all cursor-pointer hover:text-blue-400"
                     >
                       Change your profilePicture
                     </label>
                   </div>
                 </div>
               </div>
-              <div
-                onClick={() => setChangePassword(!changePassword)}
-                className="hover:text-blue-700 mx-auto cursor-pointer text-blue-500 font-semibold text-[13px]"
-              >
-                Password and security
-              </div>
-              {changePassword ? (
-                <div
-                  className={`${
-                    changePassword ? "" : "hidden"
-                  } flex flex-col gap-y-3`}
-                >
-                  <div className="flex items-center  gap-x-10 w-full max-w-[400px] mx-auto">
-                    <p className="text-[13px] w-[200px] font-semibold">
-                      Current Password
-                    </p>
-                    <Input
-                      placeholder="password"
-                      hasIcon
-                      control={control}
-                      name="currentPassword"
-                      type="password"
-                    ></Input>
-                  </div>
-                  <div className="flex items-center gap-x-10 w-full max-w-[400px] mx-auto">
-                    <p className="text-[13px] w-[200px] font-semibold">
-                      New Password
-                    </p>
-                    <Input
-                      placeholder="password"
-                      type="password"
-                      hasIcon
-                      control={control}
-                      name="password"
-                    ></Input>
-                  </div>
-
-                  <div className="flex items-center gap-x-10 w-full max-w-[400px] mx-auto">
-                    <p className="text-[13px] w-[200px] font-semibold">
-                      Confirm New Password
-                    </p>
-                    <Input
-                      placeholder="password"
-                      type="password"
-                      hasIcon
-                      control={control}
-                      name="confirmNewPassword"
-                    ></Input>
-                  </div>
-                </div>
-              ) : (
-                <></>
-              )}
 
               <div className="flex items-center gap-x-10 w-full max-w-[400px] mx-auto">
                 <p className="text-[13px] w-[200px] font-semibold">
                   Description
                 </p>
-                <Input
-                  placeholder="description"
-                  type="text"
+                <TextArea
                   control={control}
                   name="desc"
-                ></Input>
+                  className="border rounded-lg border-slate-300"
+                  placeholder="Description..."
+                ></TextArea>
               </div>
               <div className="flex items-center gap-x-10 w-full max-w-[400px] mx-auto">
                 <p className="text-[13px] w-[200px] font-semibold">City</p>
@@ -276,7 +164,11 @@ const AccountSettingPage = ({ socket }) => {
                   name="city"
                 ></Input>
               </div>
-              <Button className="mb-5" isWaiting={isSubmitting} type="primary">
+              <Button
+                className="mb-5 w-[200px]"
+                isWaiting={isSubmitting}
+                type="submit"
+              >
                 Update account
               </Button>
             </div>

@@ -23,7 +23,7 @@ const Setting = () => {
         <p>
           <IconSetting></IconSetting>
         </p>
-        <p className={` }`}>More</p>
+        <p className={` hidden laptop:block`}>More</p>
       </div>
 
       {showSetting && (

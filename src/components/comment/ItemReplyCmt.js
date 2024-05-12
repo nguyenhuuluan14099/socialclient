@@ -1,220 +1,124 @@
-import axios from "axios";
-import { useAuth } from "components/context/Auth-Context";
-import IconBtnDots from "components/icons/IconBtnDots";
+import IconAdmin from "components/icons/IconAdmin";
+import ImageUser from "components/image/ImageUser";
+import FormatTime from "components/time/FormatTime";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import CommentAction from "./CommentAction";
 import IconHeart from "components/icons/IconHeart";
 import IconHeartNone from "components/icons/IconHeartNone";
-import ImageUser from "components/image/ImageUser";
-import { setReplyComment, toggleViewCmt } from "components/redux/globalSlice";
-import React, { useEffect, useState } from "react";
+import {
+  likeComment,
+  unLikeComment,
+} from "components/redux/actions/commentAction";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { format } from "timeago.js";
+import { REPLY_TYPES } from "components/redux/reducer/replyCmtReducer";
+import ModalBase from "components/modal/ModalBase";
+import UserLikeListModalContent from "components/modal/ModalContent/UserLikeListModalContent";
 
-const ItemReplyCmt = ({
-  commentList,
-  socket,
-  shortDesc = false,
-  dataPostProfile,
-  post,
-  myUser,
-  // toggleViewCmt = false,
-  setShowListUserLike = () => {},
-  setCommentId = () => {},
-  comment,
-  handleDeleteComment = () => {},
-  setReplyData = () => {},
-  // setToggleViewCmt = () => {},
-}) => {
-  //   console.log("commentList", commentList);
-  const { user } = useAuth();
-  const [totalLikeReply, setTotalLikeReply] = useState(
-    commentList?.like?.length
-  );
-  const { viewCmt } = useSelector((state) => state.global);
+const ItemReplyCmt = ({ rep, cmtReply, post, comment }) => {
   const dispatch = useDispatch();
-  const [isLikedReplyCmt, setIsLikedReplyCmt] = useState(false);
-
-  const handleClickReplyCmt = async (type, cmtId) => {
-    try {
-      await axios.put(
-        `${process.env.REACT_APP_SERVER_URL}/comments/${cmtId}/like`,
-        {
-          userId: user._id,
-        }
-      );
-    } catch (error) {
-      console.log(error);
-    }
-
-    setTotalLikeReply(
-      isLikedReplyCmt ? totalLikeReply - 1 : totalLikeReply + 1
-    );
-    setIsLikedReplyCmt(!isLikedReplyCmt);
-
-    if (type === 6) return;
-    const dataNots = {
-      senderName: myUser.username,
-      receiverName:
-        comment.user.username === myUser.username
-          ? null
-          : comment.user.username,
-      type,
-      postId: dataPostProfile ? dataPostProfile._id : post._id,
-      postImg: dataPostProfile ? dataPostProfile.img.thumb : post.img.thumb,
-      senderImg: myUser?.profilePicture?.thumb,
-    };
-    // console.log("dataNots", dataNots);
-    // console.log("comment.user.username", comment.user.username);
-    // console.log("myUser.username", myUser.username);
-    // console.log("comment", comment);
-    // console.log("commentList", commentList);
-    if (
-      commentList.user.username === myUser.username &&
-      comment.user.username === myUser.username
-    )
-      return;
-    socket?.emit("sendNotification", dataNots);
-    try {
-      await axios.post(
-        `${process.env.REACT_APP_SERVER_URL}/notifications/`,
-        dataNots
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const { auth, socket, reply } = useSelector((state) => state);
+  const [isLikedCmt, setIsLikedCmt] = useState(false);
+  const [viewLikeList, setViewLikeList] = useState(false);
 
   useEffect(() => {
-    setIsLikedReplyCmt(commentList?.like.includes(user._id));
-  }, [commentList?.like, user._id]);
-
-  const handleReply = () => {
-    setReplyData(commentList.user.username);
-    // dispatch(toggleRemoveTag(!removeTag));
-    dispatch(toggleViewCmt(true));
-    dispatch(
-      setReplyComment({
-        cmtId: comment._id,
-        friendName: commentList.user.username,
-      })
-    );
+    if (rep.like?.some((item) => item._id === auth.user._id)) {
+      setIsLikedCmt(true);
+    } else {
+      setIsLikedCmt(false);
+    }
+  }, [auth.user._id, rep.like]);
+  const handleLikeCmt = (comment) => {
+    dispatch(likeComment({ comment, post, auth, socket }));
   };
-  const handleClickUserLike = (cmtId) => {
-    setShowListUserLike(true);
-    setCommentId(cmtId);
-  };
-  if (!commentList || user) return;
 
+  const handleUnlikeCmt = (comment) => {
+    dispatch(unLikeComment({ comment, post, auth, socket }));
+  };
+
+  const handleReply = (cmtReply) => {
+    if (reply) dispatch({ type: REPLY_TYPES.GET_REPLY, payload: false });
+    const dataReply = { ...cmtReply, commentId: comment._id };
+    dispatch({ type: REPLY_TYPES.GET_REPLY, payload: dataReply });
+  };
   return (
     <>
-      {viewCmt && (
-        <>
-          <div key={commentList._id} className="ml-[50px] ">
-            <div className="reply">
-              <div className="flex  gap-x-3 justify-between  ">
-                <div className=" flex gap-x-1 w-full ">
-                  <div
-                    className={`${
-                      shortDesc ? "" : "w-full flex  max-w-[35px] h-[35px]"
-                    }`}
-                  >
-                    {shortDesc ? (
-                      <></>
-                    ) : (
-                      <>
-                        <ImageUser
-                          smallImg={true}
-                          data={commentList?.user}
-                          story
-                          classNameImg="h-full w-full"
-                        ></ImageUser>
-                      </>
-                    )}
-                  </div>
-                  <div
-                    className={`text-[14px] mt-1 ${shortDesc ? "" : " ml-3"}`}
-                  >
-                    <div className={`${shortDesc ? "shortDesc" : ""}`}>
-                      <Link
-                        to={`/${commentList?.user?.username}`}
-                        className="hover:text-slate-500 cursor-pointer hover:underline hover:underline-offset-2 text-slate-700 dark:text-white font-[600] text-[14px] mr-1"
-                      >
-                        {commentList?.user?.username}
-                      </Link>
-                      <Link
-                        to={`/${commentList?.friendName}`}
-                        className="text-blue-900 dark:text-blue-500"
-                      >{`@${commentList?.friendName} `}</Link>
-                      {commentList?.content}
-                    </div>
-                    {shortDesc ? (
-                      <></>
-                    ) : (
-                      <>
-                        <div className="flex items-center -translate-y-[4px] gap-x-3  text-slate-500 text-[13px] dark:text-white">
-                          <p className="text-[12px]">
-                            {Number(
-                              format(commentList?.createdAt).split(" ")[0]
-                            ) >= 10
-                              ? format(commentList?.createdAt)
-                                  .split(" ")
-                                  .join("")
-                                  .slice(0, 3)
-                              : Number(
-                                  format(commentList?.createdAt).split(" ")[0]
-                                ) < 10
-                              ? format(commentList?.createdAt)
-                                  .split(" ")
-                                  .join("")
-                                  .slice(0, 2)
-                              : format(commentList?.createdAt).split(" ")[1] ===
-                                "now"
-                              ? "now"
-                              : ""}
-                          </p>
-                          {totalLikeReply > 0 && (
-                            <p
-                              onClick={() =>
-                                handleClickUserLike(commentList._id)
-                              }
-                              className="cursor-pointer"
-                            >{`${totalLikeReply} like`}</p>
-                          )}
-                          <p
-                            onClick={handleReply}
-                            className="text-slate-600 dark:text-white text-[12px] cursor-pointer"
-                          >
-                            Reply
-                          </p>
-                          <p
-                            className=" cursor-pointer"
-                            onClick={() => handleDeleteComment(commentList._id)}
-                          >
-                            <IconBtnDots></IconBtnDots>
-                          </p>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                <div className="shrink-0 mt-2">
-                  {isLikedReplyCmt ? (
-                    <IconHeart
-                      onClick={() => handleClickReplyCmt(6, commentList._id)}
-                      className="!w-4 !h-4  text-red-500"
-                    ></IconHeart>
-                  ) : (
-                    <IconHeartNone
-                      onClick={() => handleClickReplyCmt(7, commentList._id)}
-                      className="!w-4 !h-4 "
-                    ></IconHeartNone>
-                  )}
-                </div>
-              </div>
-            </div>
+      <div className="flex w-full gap-x-3">
+        <div className={`w-full flex  max-w-[35px] h-[35px]`}>
+          <ImageUser
+            smallImg={true}
+            data={rep.user}
+            story
+            classNameImg="w-full h-full"
+          ></ImageUser>
+        </div>
+        <div className={`text-[14px] mt-1}`}>
+          <div className={`flex`}>
+            <Link
+              to={`/`}
+              className="hover:text-slate-500 cursor-pointer hover:underline hover:underline-offset-2 text-slate-700 dark:text-white flex items-center gap-x-1  font-[600] text-[14px] mr-2"
+            >
+              {rep?.user?.fullname}
+              {rep?.user?.isAdmin && (
+                <IconAdmin className="!w-4 !h-4"></IconAdmin>
+              )}
+            </Link>
+            {/* {comment.content || commentData.content} */}
+            {/* <FormatComment text={rep.content}></FormatComment> */}
+            <p className={``}> {rep.content}</p>
           </div>
-        </>
+
+          <>
+            <div className="flex items-center dark:text-white -translate-y-[4px] gap-x-3  text-slate-500 text-[13px]">
+              <div className="text-[12px] ">
+                <FormatTime inputTime={rep.createdAt}></FormatTime>
+              </div>
+              {rep.like?.length > 0 && (
+                <p
+                  onClick={() => setViewLikeList(true)}
+                  className="cursor-pointer"
+                >{`${rep.like?.length} like`}</p>
+              )}
+
+              <p
+                onClick={() => handleReply(rep)}
+                className="text-slate-600 dark:text-white text-[12px] cursor-pointer"
+              >
+                Reply
+              </p>
+              <CommentAction
+                idCmtParent={cmtReply._id}
+                comment={rep}
+                post={post}
+              ></CommentAction>
+            </div>
+          </>
+        </div>
+      </div>
+
+      <div className="mt-2 shrink-0">
+        {isLikedCmt ? (
+          <IconHeart
+            onClick={() => handleUnlikeCmt(rep)}
+            className="!w-4 !h-4 text-[#FD117E]"
+          ></IconHeart>
+        ) : (
+          <IconHeartNone
+            onClick={() => handleLikeCmt(rep)}
+            className="!w-4 !h-4 "
+          ></IconHeartNone>
+        )}
+      </div>
+      {viewLikeList && (
+        <ModalBase
+          visible={viewLikeList}
+          onClose={() => setViewLikeList(false)}
+        >
+          <UserLikeListModalContent
+            listUserLike={rep.like}
+            onClose={() => setViewLikeList(false)}
+          ></UserLikeListModalContent>
+        </ModalBase>
       )}
     </>
   );

@@ -1,68 +1,39 @@
-import axios from "axios";
 import { format } from "timeago.js";
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import React from "react";
 import { Link } from "react-router-dom";
-import { v4 } from "uuid";
+import ViewAllComment from "./ViewAllComment";
 
 const PostComment = ({ post }) => {
-  const [commentList, setCommentList] = useState([]);
-  const { isComment } = useSelector((state) => state.global);
-  useEffect(() => {
-    async function getComments() {
-      try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/comments/${post._id}`
-        );
-        setCommentList(res.data.reverse());
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getComments();
-  }, [post._id, isComment]);
   return (
     <>
-      {commentList.length > 1 && !post.hideComment && (
-        <div className="cursor-pointer ">
-          <Link
-            to={`/post/${post._id}`}
-            className="text-slate-400 hover:text-slate-600 text-[14px]  transition-all"
-          >
-            {`View all ${commentList.length} comments`}
-          </Link>
-        </div>
-      )}
-      <div className="here">
-        {commentList.length > 0 &&
-          commentList
-            .slice(0, 2)
-            .reverse()
-            .map(
-              (comment) =>
-                !post.hideComment && (
-                  <div
-                    key={v4()}
-                    className="flex items-center text-[14px] gap-x-1"
-                  >
-                    <Link
-                      to={`/${comment?.user.username}`}
-                      className="font-semibold text-slate-600 dark:text-white"
-                    >
-                      {comment?.user.username}
-                    </Link>
-                    <p>{comment?.content}</p>
+      <ViewAllComment post={post}></ViewAllComment>
 
-                    {/* <ItemComment
-                          shortDesc
-                          commentData={comment}
-                        ></ItemComment> */}
+      <div className="">
+        {post.comments.length > 0 &&
+          post.comments
+            .slice(post.comments.length - 2, post.comments.length)
+            .reverse()
+            .map((comment, index) => {
+              return (
+                !post.hideComment && (
+                  <div key={index} className="flex items-center gap-x-1">
+                    <Link
+                      to={`/${comment.user?._id}`}
+                      className="font-normal text-slate-600 text-[14px] dark:text-white"
+                    >
+                      {comment?.user?.fullname}
+                    </Link>
+                    <p className="font-normal text-[13px]">{comment.content}</p>
+
+                    {/* <ItemComment shortView comment={comment}></ItemComment> */}
                   </div>
                 )
-            )}
+              );
+            })}
       </div>
+
       <div>
-        <p className="text-slate-400 text-[9px] uppercase ">
+        <p className="text-slate-400 text-[9px] p-1 uppercase ">
           {format(post.createdAt)}
         </p>
       </div>

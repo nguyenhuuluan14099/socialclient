@@ -1,220 +1,106 @@
-import axios from "axios";
-import { useAuth } from "components/context/Auth-Context";
-import IconSmile from "components/icons/IconSmile";
-import useSound from "use-sound";
-import soundSend from "components/sounds/soundSend.mp3";
-
-import {
-  addComment,
-  setReplyComment,
-  toggleRemoveTag,
-  toggleViewCmt,
-} from "components/redux/globalSlice";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { createComment } from "components/redux/actions/commentAction";
+import { REPLY_TYPES } from "components/redux/reducer/replyCmtReducer";
+import Icons from "components/icons/Icons";
+import soundSend from "../../components/sounds/soundSend.mp3";
 
-const SendComment = ({
-  post,
-  dataPostProfile,
-  // myUser,
-  receiverName,
-  socket,
-  replyData = "",
-  setReplyData = () => {},
-}) => {
-  // console.log("myUser", myUser);
-  // console.log("receiverName", receiverName);
-  // console.log("replydata", replyData);
-  const [text, setText] = useState("");
-
-  const [show, setShow] = useState(false);
-  const [content, setContent] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState([]);
-  const textRef = useRef();
-  const { user: currentUser } = useAuth();
-  const tagName = useRef();
-  const { isComment, replyComment, removeTag } = useSelector(
-    (state) => state.global
-  );
+const SendComment = ({ post, dataPostProfile }) => {
+  const [content, setContent] = useState("");
+  const soundSendRef = useRef();
+  const { auth, reply, socket, notify } = useSelector((state) => state);
   const dispatch = useDispatch();
-  const [play] = useSound(soundSend, { volume: 0.75 });
-  // useEffect(() => {
-  //   if (!tagName) return;
-  //   const widthTag = tagName?.current?.getBoundingClientRect();
-  //   setWidthTagName(widthTag?.width);
-  // }, [replyData, removeTag]);
-  useEffect(() => {
-    async function getUser() {
-      try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/users/${currentUser?._id}`
-        );
-        setUser(res.data);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getUser();
-  }, [currentUser?._id]);
-  const handleChangeBlock = (e) => {
-    setText(e.target.value);
-    setContent(e.target.value);
+  const tagName = useRef();
+  const inputRef = useRef();
+
+  const handleRemoveTag = () => {
+    dispatch({ type: REPLY_TYPES.GET_REPLY, payload: false });
   };
-  useLayoutEffect(() => {
-    if (textRef?.current?.scrollHeight >= 82) {
-      setShow(true);
-    } else {
-      setShow(false);
+
+  useEffect(() => {
+    if (content) {
+      inputRef.current && inputRef.current.focus();
     }
-  }, [text]);
-  // console.log("myUser.username", myUser.username);
-  // console.log("receiverName.username", receiverName.username);
-  const handleCreateComment = async (type) => {
-    // console.log(dataPostProfile);
+  }, [content]);
+
+  const handleCreateComment = async (e) => {
+    e.preventDefault();
+    if (!content.trim()) {
+      if (reply) dispatch({ type: REPLY_TYPES.GET_REPLY, payload: false });
+      return;
+    }
 
     if (!content) return;
     const value = {
-      content,
-      likes: [],
       postId: dataPostProfile ? dataPostProfile._id : post._id,
-      user: user,
-      reply: replyComment.cmtId,
-      friendName: replyComment.friendName,
+      content,
       createdAt: new Date().toISOString(),
+      reply: reply ? reply.commentId : [],
+      tag: reply ? reply.user : [],
     };
-    // console.log("type", type);
-    try {
-      setLoading(true);
-      await axios.post(`${process.env.REACT_APP_SERVER_URL}/comments/`, value);
-      play();
-      setLoading(false);
-      setContent("");
-      setReplyData(null);
-      dispatch(toggleRemoveTag(true));
-      dispatch(toggleViewCmt(true));
-      dispatch(setReplyComment({}));
-      dispatch(addComment(!isComment));
 
-      const dataNots = {
-        senderName: currentUser.username,
-        receiverName:
-          replyData !== null &&
-          replyData !== currentUser.username &&
-          receiverName.userName === currentUser.username
-            ? replyData
-            : receiverName.userName === currentUser.username
-            ? null
-            : receiverName.userName,
-
-        type,
-        postImg: dataPostProfile ? dataPostProfile.img.thumb : post.img.thumb,
-        postId: dataPostProfile ? dataPostProfile._id : post._id,
-        senderImg: currentUser.profilePicture.thumb,
-      };
-      // console.log("type", type);
-      // console.log("dataNots", dataNots);
-      if (
-        (receiverName.username === currentUser.username &&
-          replyData === currentUser.username) ||
-        dataNots.receiverName === null
-      )
-        return;
-
-      // console.log("dataNots", dataNots);
-      socket?.emit("sendNotification", dataNots);
-      try {
-        await axios.post(
-          `${process.env.REACT_APP_SERVER_URL}/notifications/`,
-          dataNots
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    dispatch(createComment({ post, comment: value, auth, socket }));
+    if (notify.sound) soundSendRef.current.play();
+    setContent("");
+    if (reply) dispatch({ type: REPLY_TYPES.GET_REPLY, payload: false });
   };
-  const handleValue = () => {
-    dispatch(toggleRemoveTag(!removeTag));
-    setReplyData(null);
-    dispatch(setReplyComment({}));
-  };
-  // console.log("replyData", replyData);
-  // console.log("receiverName", receiverName.username);
-  // console.log("receiverName.username", receiverName.username);
-  // console.log("myUser.username", myUser.username);
-  if (!currentUser) return;
+
   return (
-    <div className="bottom flex px-2 items-center justify-between w-full border-transparent    border border-t-slate-200 dark:border-[#363636]">
-      <div>
-        <IconSmile className="dark:text-white"></IconSmile>
+    <div className="mt-auto bottom flex  items-center justify-between  w-full      dark:border-t-[#363636]">
+      <div className="hidden">
+        <audio controls ref={soundSendRef}>
+          <source src={soundSend} type="audio/mp3" />
+        </audio>
       </div>
-      <div className="w-full  mx-2  relative flex flex-col">
-        <div>
-          <textarea
-            ref={textRef}
-            onChange={handleChangeBlock}
-            placeholder={`Add a comment...`}
-            value={`${content}`}
-            // style={{
-            //   height: textHeight,
-            //   paddingLeft: removeTag ? 0 : widthTagName + 10 + "px",
-            // }}
-            className={`dark:bg-black  pt-6   dark:text-white w-full ${
-              replyData ? "pt-[20px]" : ""
-            } transition-all  text-[14px]   h-full max-h-[72px]  outline-none resize-none ${
-              show ? "overflow-y-scroll pt-[20px]" : "overflow-hidden"
-            }`}
-            type="text"
-          />
-        </div>
 
-        <div
-          ref={tagName}
-          className={`absolute dark:bg-black dark:text-white  bg-white z-10 inline-block left-0 top-0 group cursor-pointer `}
-        >
-          <p
-            className={`text-[14px] text-blue-900 ${
-              replyData ? "" : "opacity-0 visibility hidden"
-            }`}
-          >{`@${replyData} `}</p>
-          <p
-            onClick={handleValue}
-            className={`absolute bg-slate-400 rounded-full   flex items-center justify-center p-2 text-white dark:bg-black dark:text-white w-[10px] h-[10px] -top-2 cursor-pointer -right-2 ${
-              replyData ? "visible" : " hidden"
-            }`}
+      <form className="flex items-center w-full mx-2 ">
+        {reply && (
+          <div
+            ref={tagName}
+            className={` text-blue-500 text-xs  mr-1  group cursor-pointer relative `}
           >
-            <span>&times;</span>
-          </p>
-        </div>
-      </div>
-      <div className="mb-1">
-        {text ? (
-          loading ? (
-            <div className="w-[13px] h-[13px] rounded-full border-[3px] border-blue-500 border-t-transparent animate-spin"></div>
-          ) : (
+            <p> @{reply.user.fullname}</p>
+            <p
+              onClick={handleRemoveTag}
+              className="absolute cursor-pointer text-[16px] -top-2 -right-1 "
+            >
+              &times;
+            </p>
+          </div>
+        )}
+        <input
+          ref={inputRef}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder={`Add a comment...`}
+          value={`${content}`}
+          className={`dark:bg-black   flex-1  py-2  dark:text-white w-full transition-all  text-[14px] pb-3  h-full max-h-[72px]  outline-none resize-none`}
+          type="text"
+        ></input>
+
+        <div>
+          {content.trim() ? (
             <>
-              <span
-                onClick={() =>
-                  handleCreateComment(
-                    replyData && replyData !== currentUser.username ? 8 : 2
-                  )
-                }
-                className={`hover:text-blue-900 transition-all interactButton cursor-pointer  text-blue-600 font-semibold`}
+              {" "}
+              <button
+                type="submit"
+                onClick={(e) => handleCreateComment(e)}
+                className={`hover:text-blue-900 transition-all interactButton cursor-pointer  text-blue-600 font-semibold mr-1`}
               >
                 Post
-              </span>
+              </button>
             </>
-          )
-        ) : (
-          <span
-            className={`transition-all font-semibold postButton text-blue-200 cursor-default`}
-          >
-            Post
-          </span>
-        )}
-      </div>
+          ) : (
+            <></>
+          )}
+        </div>
+        <div>
+          <Icons
+            position="laptop:right-0"
+            content={content}
+            setContent={setContent}
+          ></Icons>
+        </div>
+      </form>
     </div>
   );
 };

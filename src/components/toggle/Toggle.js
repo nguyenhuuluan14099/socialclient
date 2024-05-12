@@ -19,7 +19,7 @@ const Toggle = ({ on = true, onClick = () => {} }) => {
         >
           <div
             className={`w-[23px] h-[23px] transition duration-300  rounded-full bg-white ${
-              on ? "translate-x-[17px] " : ""
+              on ? "translate-x-[15px] " : ""
             } `}
           ></div>
         </div>

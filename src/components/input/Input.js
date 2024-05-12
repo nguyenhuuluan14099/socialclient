@@ -30,7 +30,9 @@ const Input = ({
       <div className="w-full relative ">
         <input
           autoFocus={focus}
-          className={`dark:placeholder-slate-600 placeholder-slate-300 pl-10  bg-transparent  rounded-lg ${
+          className={`dark:placeholder-slate-600 placeholder-slate-300 ${
+            IconInput ? "pl-10" : ""
+          }  bg-transparent  rounded-lg ${
             className
               ? className
               : "border bg-slate-200  dark:bg-transparent  p-3"

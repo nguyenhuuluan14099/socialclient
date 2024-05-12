@@ -1,51 +1,24 @@
-import parse from "html-react-parser";
-import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 
 const PostDescView = ({ username = "", postDesc = "" }) => {
-  const [moreTitle, setMoreTitle] = useState(false);
-  const [moreButton, setMoreButton] = useState(false);
-  const moreTitleRef = useRef();
-  useEffect(() => {
-    const a = moreTitleRef.current;
-    const b = a.getBoundingClientRect();
-    if (b.height > 40) {
-      a.classList.add("truncate-class");
-      setMoreTitle(true);
-    }
-    if (moreButton && a.classList.contains("truncate-class")) {
-      a.classList.remove("truncate-class");
-      setMoreTitle(false);
-    }
-  }, [moreButton]);
+  const [readMore, setReadMore] = useState(false);
   return (
     <>
-      <div className={`${moreButton ? "" : "flex"}`}>
-        <Link
-          to={`/${username}`}
-          className="text-slate-700 dark:text-white  text-[14px font-semibold  mb-2"
+      <p>
+        {postDesc.length < 70
+          ? postDesc
+          : readMore
+          ? postDesc
+          : postDesc.slice(0, 70) + "..."}
+      </p>
+      {postDesc.length > 70 && (
+        <p
+          onClick={() => setReadMore(true)}
+          className={`text-[13px] cursor-pointer dark:text-slate-200 pl-1 pt-[3px] `}
         >
-          {username}
-        </Link>{" "}
-        <div
-          ref={moreTitleRef}
-          className="ml-1 mb-1 description-block overflow-hidden   tracking-tight truncateTitle dark:text-white"
-        >
-          {parse(postDesc || "")}
-        </div>
-      </div>
-      {moreTitle ? (
-        <>
-          <div
-            onClick={() => setMoreButton(true)}
-            className="text-slate-400  cursor-pointer  text-[14px]"
-          >
-            <span>...</span>
-            more
-          </div>
-        </>
-      ) : (
-        <></>
+          {" "}
+          {readMore ? "" : "...more"}
+        </p>
       )}
     </>
   );

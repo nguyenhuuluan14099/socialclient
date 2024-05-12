@@ -4,17 +4,12 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import ModalBase from "components/modal/ModalBase";
-import PostModalContent from "components/modal/ModalContent/PostModalContent";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useDispatch, useSelector } from "react-redux";
-import { setIsReload } from "components/redux/globalSlice";
 import ImageLazy from "components/image/ImageLazy";
 
 const TablePost = ({ currentItems }) => {
   const [showModal, setShowModal] = useState(false);
-  const { isReload } = useSelector((state) => state.global);
-  const dispatch = useDispatch();
   const [idPost, setIdPost] = useState("");
   if (!currentItems) return;
 
@@ -26,15 +21,23 @@ const TablePost = ({ currentItems }) => {
   const handleDeletePost = async () => {
     try {
       await axios.delete(`${process.env.REACT_APP_SERVER_URL}/posts/${idPost}`);
-      toast.success("You have been deleted post");
-      dispatch(setIsReload(!isReload));
+      toast.success("You have been deleted post", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
       setShowModal(false);
     } catch (error) {
       console.log(error);
     }
   };
   return (
-    <div className="overflow-x-auto overflow-y-auto mb-16">
+    <div className="mb-16 overflow-x-auto overflow-y-auto">
       <table>
         <thead>
           <tr className="py-3">
@@ -62,22 +65,22 @@ const TablePost = ({ currentItems }) => {
                 <td>
                   <ImageLazy
                     url={
-                      item.user.profilePicture?.thumb ||
+                      item.user.profilePicture[0]?.imageThumb ||
                       "https://i.ibb.co/1dSwFqY/download-1.png"
                     }
                     className="w-[40px] h-[40px] rounded-full object-cover"
                     alt=""
                   />
                 </td>
-                <td>{`${item.user.userName}`}</td>
+                <td>{`${item.user.fullname}`}</td>
                 <td title={item.desc} className="w-[200px]">
                   {item.desc.slice(0, 20)}
                 </td>
                 <td>
-                  <ImageLazy
+                  <img
                     className="w-[40px] h-[40px] rounded-xs object-cover"
-                    url={
-                      item.img.thumb ||
+                    src={
+                      item.img[0].imageThumb ||
                       "https://i.ibb.co/1dSwFqY/download-1.png"
                     }
                     alt=""
@@ -109,13 +112,13 @@ const TablePost = ({ currentItems }) => {
           <div className="flex flex-col cursor-pointer">
             <p
               onClick={handleDeletePost}
-              className="w-full text-center p-3 border border-b-slate-300  text-red-500 font-semibold"
+              className="w-full p-3 font-semibold text-center text-red-500 border border-b-slate-300"
             >
               Delete
             </p>
             <p
               onClick={() => setShowModal(false)}
-              className="w-full text-center p-3"
+              className="w-full p-3 text-center"
             >
               Cancel
             </p>

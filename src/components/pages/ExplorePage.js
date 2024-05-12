@@ -1,92 +1,73 @@
-import axios from "axios";
-import { useAuth } from "components/context/Auth-Context";
-import Header from "components/header/Header";
+import ButtonLoadMore from "components/button/ButtonLoadMore";
 import Loading from "components/loading/Loading";
-import LoadingSkeleton from "components/loading/LoadingSkeleton";
 import ItemPost from "components/post/ItemPost";
+import { getPostExplore } from "components/redux/actions/exploreAction";
+import { EXPLORE_TYPES } from "components/redux/reducer/exploreReducer";
 
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { v4 } from "uuid";
+import { getDataApi } from "utils/fetchData";
 
-const ExplorePage = ({ socket }) => {
-  const { user } = useAuth();
-  const [suggestUser, setSuggestUser] = useState([]);
-  const [suggestPosts, setSuggestPosts] = useState([]);
-  // const { isLoading } = useSelector((state) => state.global);
-  const [loading, setLoading] = useState(false);
-
-  const [numberItem, setNumberItem] = useState(6);
+const ExplorePage = () => {
+  const { auth, explore } = useSelector((state) => state);
   const dispatch = useDispatch();
+  const [load, setLoad] = useState(false);
 
   useEffect(() => {
-    async function getSuggestList() {
-      try {
-        setLoading(true);
-        const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/users/suggest/${user._id}`
-        );
-        setSuggestUser(res.data);
-        setLoading(false);
-        // setAllPost(allPost);
-      } catch (error) {
-        console.log(error);
-      }
+    if (!explore.firstLoad) {
+      dispatch(getPostExplore(auth.token));
     }
-    getSuggestList();
-  }, [user._id, dispatch]);
-  useEffect(() => {
-    if (suggestUser.length > 0) {
-      const posts = suggestUser.filter((post) => post.userId);
-      setSuggestPosts(posts);
-    }
-  }, [suggestUser]);
+  }, [explore.firstLoad, auth.token, dispatch, auth.user.followings]);
 
-  const handleLoadMore = () => {
-    setNumberItem(numberItem + 6);
+  const handleLoadMore = async () => {
+    try {
+      setLoad(true);
+      const res = await getDataApi(
+        `postExplore?num=${explore.page * 9}`,
+        auth.token
+      );
+      dispatch({ type: EXPLORE_TYPES.UPDATE_POSTS_EXPLORE, payload: res.data });
+      setLoad(false);
+    } catch (error) {
+      console.log(error);
+    }
   };
-  if (!user) return;
-  console.log("suggestPost", suggestPosts);
   return (
     <>
       {/* <Header socket={socket}></Header> */}
-      <div className="my-16 mr-[200px] w-full">
-        {suggestPosts.length === 0 ? (
-          <div className="text-slate-600 font-semibold mx-auto  text-xl">
+      <div className="my-8 h-full laptop:ml-[130px] w-full max-w-[900px] ">
+        {explore.posts.length === 0 ? (
+          <div className="mx-auto text-xl font-semibold text-slate-600">
             No Post Suggest
           </div>
         ) : (
-          <p className="text-slate-600 font-semibold mx-auto  text-xl">
-            Post Suggest
-          </p>
+          <></>
         )}
-        <div className="py-7 grid grid-cols-3 gap-3 xl:gap-2">
-          {loading && (
-            <>
-              <LoadingSkeleton width="300px" height="250px"></LoadingSkeleton>
-              <LoadingSkeleton width="300px" height="250px"></LoadingSkeleton>
-              <LoadingSkeleton width="300px" height="250px"></LoadingSkeleton>
-            </>
-          )}
-          {!loading &&
-            suggestPosts.length > 0 &&
-            suggestPosts.slice(0, numberItem).map((post) => (
-              <div key={post._id} className="">
-                <ItemPost socket={socket} post={post}></ItemPost>
-              </div>
-            ))}
+        <div className="grid grid-cols-3 gap-3 py-7 xl:gap-2 ">
+          {explore.loading && <Loading></Loading>}
+          {!explore.loading &&
+            explore.posts.length > 0 &&
+            explore.posts.map((post) => {
+              return <ItemPost key={post._id} post={post}></ItemPost>;
+            })}
         </div>
-        <div className="w-full flex mb-7">
+        <ButtonLoadMore
+          load={load}
+          page={explore.page}
+          result={explore.result}
+          handleLoadMore={handleLoadMore}
+        ></ButtonLoadMore>
+        {/* <div className="flex w-full mb-7">
           {suggestPosts.length > 6 && numberItem < suggestPosts.length && (
             <button
               onClick={handleLoadMore}
-              className="p-3 inline-block rounded-lg text-white bg-blue-500 mx-auto "
+              className="inline-block p-3 mx-auto text-white bg-blue-500 rounded-lg "
             >
               Load More
             </button>
           )}
-        </div>
+        </div> */}
       </div>
     </>
   );

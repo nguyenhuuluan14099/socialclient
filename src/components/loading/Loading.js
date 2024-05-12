@@ -1,17 +1,16 @@
-import ImageLazy from "components/image/ImageLazy";
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React from "react";
 
-const Loading = ({ className = "", show = false }) => {
-  // const [showLoading, setShowLoading] =  useState(false)
-  // const { isLoading } = useSelector((state) => state.global);
-
+const Loading = ({ className = "w-[23px] h-[23px]" }) => {
   return (
-    <>
-      {show && (
-        <div className="loading w-20 h-20 rounded-full   border-blue-500 border-3 border-t-transparent border-b-transparent animate-spin"></div>
-      )}
-    </>
+    <div className="fixed inset-0 z-50 flex w-full h-full bg-opacity-25 bg-slate-300">
+      <div className="m-auto">
+        <img
+          src="/logoHome.png"
+          alt=""
+          className={`object-cover animate-spin ${className}`}
+        />
+      </div>
+    </div>
   );
 };
 

@@ -1,63 +1,49 @@
-import axios from "axios";
-import { useAuth } from "components/context/Auth-Context";
+import ButtonLoadMore from "components/button/ButtonLoadMore";
 import Post from "components/post/Post";
 import PostLoading from "components/post/PostLoading";
+import { POST_TYPES } from "components/redux/actions/postAction";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getDataApi } from "utils/fetchData";
 
-const PostList = ({ socket, currentUser }) => {
-  const [loading, setLoading] = useState(false);
-  const [userPosts, setUserPosts] = useState([]);
-  const { user } = useAuth();
-  const [postsAdmin, setPostsAdmin] = useState([]);
-  const { isUpdate } = useSelector((state) => state.global);
-  // console.log("re-render");
-  useEffect(() => {
-    async function getUserPosts() {
-      try {
-        setLoading(true);
-        const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/posts/timeline/` + user._id
-        );
-
-        setLoading(false);
-        setUserPosts(
-          res.data.sort((p1, p2) => {
-            return new Date(p2.createdAt) - new Date(p1.createdAt);
-          })
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getUserPosts();
-  }, [user._id, isUpdate]);
+const PostList = () => {
+  const { auth, posts } = useSelector((state) => state);
+  const [postSuggest, setPostSuggest] = useState([]);
+  const dispatch = useDispatch();
+  const [load, setLoad] = useState(false);
 
   useEffect(() => {
-    async function getPostAdmin() {
-      try {
-        // dispatch(setShowLoading(true));
+    const id = "6631fe3d38a34a46b3c2e557";
+    const getData = async () => {
+      await getDataApi(`post/${id}`, auth.token).then((res) => {
+        setPostSuggest([res.data.post]);
+      });
+    };
+    getData();
+  }, [auth.token]);
 
-        const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/posts/getPostUser/64243346e08ff82368262657`
-        );
-        // dispatch(setShowLoading(false));
+  const handleLoadMore = async () => {
+    try {
+      setLoad(true);
+      const res = await getDataApi(`posts?limit=${posts.page * 9}`, auth.token);
 
-        setPostsAdmin(
-          res.data.sort((p1, p2) => {
-            return new Date(p2.createdAt) - new Date(p1.createdAt);
-          })
-        );
-      } catch (error) {
-        console.log(error);
-      }
+      dispatch({
+        type: POST_TYPES.GET_POSTS,
+        payload: {
+          posts: res.data.posts,
+          result: res.data.result,
+          page: posts.page + 1,
+        },
+      });
+      setLoad(false);
+    } catch (error) {
+      console.log("error", error);
     }
-    getPostAdmin();
-  }, []);
-  if (!user) return;
+  };
+
   return (
-    <div>
-      {loading && (
+    <div className="mb-16 w-full max-w-full laptop:max-w-[500px] mx-auto laptop:mx-auto m-3 laptop:m-0">
+      {posts.loading && (
         <>
           <PostLoading></PostLoading>
           <PostLoading></PostLoading>
@@ -65,17 +51,24 @@ const PostList = ({ socket, currentUser }) => {
         </>
       )}
       {/*  */}
-      {!loading &&
-        userPosts.length > 0 &&
-        userPosts.map((post) => (
-          <Post socket={socket} key={post._id} post={post}></Post>
-        ))}
-      {!loading &&
-        currentUser?.followings?.length === 0 &&
-        postsAdmin.length > 0 &&
-        postsAdmin.map((post) => (
-          <Post socket={socket} key={post._id} post={post}></Post>
-        ))}
+      {!posts.loading &&
+        posts.posts.length > 0 &&
+        posts.posts
+          .sort((p1, p2) => {
+            return new Date(p2.createdAt) - new Date(p1.createdAt);
+          })
+          .map((post) => <Post key={post._id} post={post}></Post>)}
+      {!posts.loading &&
+        posts.posts.length === 0 &&
+        postSuggest.length > 0 &&
+        postSuggest.map((post) => <Post key={post._id} post={post}></Post>)}
+
+      <ButtonLoadMore
+        page={posts.page}
+        result={posts.result}
+        load={load}
+        handleLoadMore={handleLoadMore}
+      ></ButtonLoadMore>
     </div>
   );
 };

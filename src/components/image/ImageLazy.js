@@ -9,7 +9,7 @@ const ImageLazy = ({ url, className = "", height = "", width = "" }) => {
       className={` ${className}`}
       alt="image"
       effect="blur"
-      src={url}
+      src={url.imageThumb || url}
     ></LazyLoadImage>
   );
 };

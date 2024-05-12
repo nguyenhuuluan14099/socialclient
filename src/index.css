@@ -222,6 +222,10 @@ html.dark {
 .entry-content .ql-container.ql-snow {
   border: none;
 }
+
+.entry-content .ql-container.ql-snow .ql-editor {
+  display: flex !important;
+}
 .entry-content,
 .entry-content .ql-snow .ql-editor {
   font-family: "Epilogue", sans-serif;
@@ -482,4 +486,17 @@ tr:nth-child(even) {
 }
 .lazy-load-image-background {
   margin: auto 0;
+}
+@media screen and (min-width: 1024px) {
+  .swiper-wrapper .lazy-load-image-background {
+    height: 100%;
+  }
+}
+.swiper-wrapper .swiper-slide .lazy-load-image-loaded {
+  height: 100%;
+}
+
+/* accordion */
+.szh-accordion__item-btn {
+  width: 100%;
 }

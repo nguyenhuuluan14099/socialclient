@@ -85,6 +85,7 @@ const Modal = ({
       )}
 
       <div
+        // onClick={type === "share" ? handleClick : onClose}
         onClick={type === "share" ? handleClick : onClose}
         className={`overlay absolute  inset-0 ${bgOverlay}`}
       >

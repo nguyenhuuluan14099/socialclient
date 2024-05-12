@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector } from "react-redux";
 
 const Button = ({
   type = "button",
@@ -7,6 +8,7 @@ const Button = ({
   className = "",
   children,
 }) => {
+  const { loading } = useSelector((state) => state);
   let styled = "";
   switch (type) {
     case "primary":
@@ -35,7 +37,8 @@ const Button = ({
       }`}
       type={type}
     >
-      {isWaiting ? (
+      {/* <div className="w-[27px] h-[27px] border-t-transparent animate-spin border-b-transparent rounded-full border-white border-[3px]"></div> */}
+      {loading ? (
         <div className="w-[27px] h-[27px] border-t-transparent animate-spin border-b-transparent rounded-full border-white border-[3px]"></div>
       ) : (
         <span className="font-semibold">{children}</span>

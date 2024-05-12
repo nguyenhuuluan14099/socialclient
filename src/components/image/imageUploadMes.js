@@ -1,24 +1,34 @@
-import axios from "axios";
 import { imgbbAPI } from "components/config/config";
 
-export const imageUpload = async (value) => {
-  for (const item of value) {
-    const bodyFormData = new FormData();
-    bodyFormData.append("image", item);
+export const checkImage = (file) => {
+  let err = "";
 
-    const response = await axios({
-      method: "post",
-      url: `${imgbbAPI}`,
-      data: bodyFormData,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+  if (!file) err = "image does not exist!";
+
+  if (file.size > 1024 * 1024) err = "image largest is 1mb.";
+
+  if (file.type !== "image/jpeg" && file.type !== "image/png")
+    err = "image format is incorrect";
+
+  return err;
+};
+
+export const imageUpload = async (values) => {
+  const arrImg = [];
+  for (const image of values) {
+    const bodyFormData = new FormData();
+    bodyFormData.append("image", image);
+    const res = await fetch(`${imgbbAPI}`, {
+      method: "POST",
+      body: bodyFormData,
     });
-    const imgData = response.data.data;
-    const objectImg = {
-      thumb: imgData.thumb.url,
-      url: imgData.url,
-    };
-    return objectImg;
+    const images = await res.json();
+    console.log("imageshere", images);
+    arrImg.push({
+      imageId: images.data.id,
+      imageThumb: images.data.thumb.url,
+      imageUrl: images.data.display_url,
+    });
   }
+  return arrImg;
 };

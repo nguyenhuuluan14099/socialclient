@@ -1,145 +1,31 @@
-import axios from "axios";
-
 import IconClose from "components/icons/IconClose";
-import { setIsReload, setMarkNot } from "components/redux/globalSlice";
-import React, { useState } from "react";
-
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { format } from "timeago.js";
+import React, { useState, useEffect } from "react";
 import { v4 } from "uuid";
 import ModalBase from "../ModalBase";
-import ImageLazy from "components/image/ImageLazy";
+import StatusNotification from "components/Notification/StatusNotification";
+import { deleteAllNotify } from "components/redux/actions/notifyAction";
+import { useDispatch, useSelector } from "react-redux";
 
-const NotificationModalContent = ({
-  user,
-  notifications,
-  socket,
-  setNotifications = () => {},
-  onClose = () => {},
-}) => {
-  const { markNot, isReload } = useSelector((state) => state.global);
-  // console.log("notifications", notifications);
-
-  const dispatch = useDispatch();
+const NotificationModalContent = ({ notifies, onClose = () => {} }) => {
   const [showModal, setShowModal] = useState(false);
-  const handleMarkAllRead = async () => {
-    try {
-      await axios.delete(
-        `${process.env.REACT_APP_SERVER_URL}/notifications/${user?.username}`
-      );
-      dispatch(setMarkNot(!markNot));
-      setNotifications([]);
-      setShowModal(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const handleClickNot = () => {
-    onClose();
-    dispatch(setIsReload(!isReload));
+  const [notifiesUnRead, setNotifiesUnRead] = useState(0);
+  const { auth } = useSelector((state) => state);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const newArr = notifies.filter((not) => not.isRead === false);
+    setNotifiesUnRead(newArr.length);
+  }, [notifies]);
+
+  const handleDeleteALlNotifies = () => {
+    dispatch(deleteAllNotify(auth.token));
+    setShowModal(false);
   };
 
-  const displayNotification = ({
-    senderName,
-    type,
-    postId,
-    senderImg,
-    senderId,
-    postImg,
-    createdAt,
-  }) => {
-    const timeCreate = format(createdAt).split(" ");
-
-    const first = Number(timeCreate[0]);
-    let result = "";
-    if (first >= 10) {
-      result = timeCreate.join("")?.slice(0, 3);
-    }
-    if (first < 10) {
-      result = timeCreate.join("")?.slice(0, 2);
-    }
-    if (timeCreate[1] === "now") {
-      result = "now";
-    }
-    let action = "";
-    switch (type) {
-      case 1:
-        action = "liked your post.";
-        break;
-      case 2:
-        action = "commented your post.";
-        break;
-      case 3:
-        action = "started following you.";
-        break;
-      case 4:
-        action = "sent you a message.";
-        break;
-      case 8:
-        action = "reply your comment.";
-        break;
-      case 7:
-        action = "liked your comment.";
-        break;
-      default:
-        action = "";
-        break;
-    }
-
-    return (
-      <div className="w-full flex items-center  justify-between py-2">
-        <Link to={`${senderName}`}>
-          <ImageLazy
-            url={senderImg || "https://i.ibb.co/1dSwFqY/download-1.png"}
-            className="w-[40px] h-[40px] rounded-full object-cover shrink-0"
-            alt=""
-          />
-        </Link>
-        <Link
-          to={`${
-            type !== 3
-              ? `${type === 4 ? `/messenger/${senderId}` : `/post/${postId}`}`
-              : `/${senderName}`
-          }`}
-          className="pl-2 flex flex-col flex-1 w-full "
-        >
-          <div className="text-[14px]">
-            <span className="font-semibold ">{senderName?.slice(0, 15)}</span>{" "}
-            {`${action}`} <p className="text-[13px] text-slate-400">{result}</p>
-          </div>
-        </Link>
-        {type === 3 ? (
-          <Link
-            to={`/${senderName}`}
-            className="bg-blue-500  p-1 py-2  rounded-lg text-white flex items-center justify-center"
-          >
-            <p className="text-[11px]"> View Profile</p>
-          </Link>
-        ) : (
-          <>
-            {type === 4 ? (
-              <></>
-            ) : (
-              <>
-                <Link to={`/post/${postId}`}>
-                  <ImageLazy
-                    url={postImg}
-                    className="w-[40px] h-[40px] object-cover shrink-0"
-                    alt=""
-                  />
-                </Link>
-              </>
-            )}
-          </>
-        )}
-      </div>
-    );
-  };
   return (
     <div>
       <div className="w-full dark:bg-black">
-        <div className="text-xl flex items-center justify-between font-semibold mb-5 p-5 w-full border border-transparent border-b-slate-300">
+        <div className="flex items-center justify-between w-full p-5 mb-5 text-xl font-semibold border border-transparent border-b-slate-300">
           Notifications
           <p onClick={onClose} className="cursor-pointer">
             <IconClose></IconClose>
@@ -147,40 +33,49 @@ const NotificationModalContent = ({
         </div>
 
         <div className="w-full  flex flex-col dark:bg-black h-full max-h-[550px] overflow-y-auto">
-          {notifications.length > 0 &&
-            notifications.map((not) => (
+          {notifies.length > 0 &&
+            notifies.map((not) => (
               <div
-                onClick={() => handleClickNot()}
+                onClick={onClose}
                 key={v4()}
                 className="hover:bg-blue-100 dark:hover:bg-[#262626] transition-all cursor-pointer px-3"
               >
-                {/* {setData(not)} */}
-                {displayNotification(not)}
+                <StatusNotification not={not}></StatusNotification>
               </div>
             ))}
         </div>
-        {notifications.length !== 0 && (
+        {notifies.length !== 0 ? (
           <button
             onClick={() => setShowModal(true)}
-            className="w-full top-0  p-3 left-0 bg-blue-500 rounded-lg text-white"
+            className="top-0 my-3 left-0 w-full p-3 text-white bg-blue-500 rounded-lg"
           >
-            Mark all read
+            Delete All Notifications
           </button>
+        ) : (
+          <p className="p-3 text-xl font-bold text-slate-300 ">
+            Don't have any notifications
+          </p>
         )}
-        <p className="text-slate-300 text-xl font-bold p-3  ">
-          Don't have any notifications
-        </p>
       </div>
       {showModal && (
         <ModalBase visible={showModal} onClose={() => setShowModal(false)}>
-          <div className="w-full  text-center cursor-pointer">
+          <div className="w-full text-center cursor-pointer">
+            {notifiesUnRead > 0 && (
+              <div className="p-2 bg-blue-500">
+                <p>{`You have ${notifiesUnRead} notifications unRead.
+             `}</p>
+              </div>
+            )}
+
             <p
-              onClick={handleMarkAllRead}
-              className="w-full p-3 text-blue-500 font-semibold border border-transparent border-b-slate-300"
+              onClick={handleDeleteALlNotifies}
+              className="w-full p-3 font-semibold text-red-500 border border-transparent border-b-slate-300"
             >
-              Mark all read
+              DELETE ALL
             </p>
-            <p className="w-full p-3 ">Cancel</p>
+            <p onClick={() => setShowModal(false)} className="w-full p-3 ">
+              Cancel
+            </p>
           </div>
         </ModalBase>
       )}

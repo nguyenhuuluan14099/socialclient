@@ -1,21 +1,22 @@
-import React, { useEffect } from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
+import "./styles/global.css";
 import App from "./App";
+import axios from "axios";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import { Provider } from "react-redux";
-import store from "components/redux/ConfigureStore";
+import DataProvider from "components/redux/store";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
+axios.defaults.baseURL = "http://localhost:5000";
 root.render(
-  <Provider store={store}>
+  <DataProvider>
     <BrowserRouter>
       <ToastContainer></ToastContainer>
       <App />
     </BrowserRouter>
-  </Provider>
+  </DataProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

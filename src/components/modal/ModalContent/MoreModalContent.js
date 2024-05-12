@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import ModalBase from "../ModalBase";
 import ToggleDarkMode from "components/darkMode/ToggleDarkMode";
-import { useAuth } from "components/context/Auth-Context";
+// import { logout } from "components/redux/actions/authAction";
+import { useDispatch, useSelector } from "react-redux";
+import { NOTIFY_TYPES } from "components/redux/reducer/notifyReducer";
+import IconBellOn from "components/icons/IconBellOn";
+import IconBellOff from "components/icons/IconBellOff";
+import { Logout } from "utils/auth";
+import { useNavigate } from "react-router-dom";
 const data = [
   {
     id: 1,
@@ -72,23 +77,21 @@ const data = [
   },
 ];
 const MoreModalContent = ({ onClose = () => {} }) => {
+  const dispatch = useDispatch();
+  const { notify } = useSelector((state) => state);
   const navigate = useNavigate();
-  const { user, dispatch } = useAuth();
+
   const handleLogOut = () => {
-    dispatch({
-      type: "LOGOUT",
-      payload: "",
-    });
+    Logout();
+    navigate("/login");
   };
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user, navigate]);
+  const handleMuteNotify = () => {
+    dispatch({ type: NOTIFY_TYPES.UPDATE_SOUND, payload: !notify.sound });
+  };
   const [showConfirm, setShowConfirm] = useState(false);
 
   return (
-    <div onClick={onClose} className="flex flex-col domEle in cursor-pointer">
+    <div onClick={onClose} className="flex flex-col cursor-pointer domEle in">
       {showConfirm && (
         <ModalBase
           styleModalContent="w-full max-w-[200px]"
@@ -98,13 +101,13 @@ const MoreModalContent = ({ onClose = () => {} }) => {
           <div className="text-center cursor-pointer">
             <p
               onClick={handleLogOut}
-              className="p-3 text-red-500 font-semibold w-full"
+              className="w-full p-3 font-semibold text-red-500"
             >
               LogOut
             </p>
             <p
               onClick={() => setShowConfirm(false)}
-              className="p-3 border border-transparent border-t-slate-300 w-full"
+              className="w-full p-3 border border-transparent border-t-slate-300"
             >
               Cancel
             </p>
@@ -121,7 +124,14 @@ const MoreModalContent = ({ onClose = () => {} }) => {
           <span>{item.icon}</span>
         </div>
       ))}
+      <div
+        className="flex items-center dark:bg-black dark:hover:bg-[#262626] hover:bg-slate-100 transition-all last:border-none justify-between p-3 border border-transparent dark:border-[#262626] border-b-slate-300"
+        onClick={handleMuteNotify}
+      >
+        <p className="text-[14px]">{notify.sound ? "Sound On" : "Sound Off"}</p>
 
+        {notify.sound ? <IconBellOn></IconBellOn> : <IconBellOff></IconBellOff>}
+      </div>
       <ToggleDarkMode></ToggleDarkMode>
       <div
         onClick={() => setShowConfirm(true)}

@@ -1,11 +1,9 @@
-import { useAuth } from "components/context/Auth-Context";
 import ModalBase from "components/modal/ModalBase";
 import FollowerModalContent from "components/modal/ModalContent/FollowerModalContent";
 import React, { useEffect, useState } from "react";
 
-const ViewFollowers = ({ slug }) => {
+const ViewFollowers = ({ slug, user, follower = false }) => {
   const [showFollowers, setShowFollowers] = useState(false);
-  const { user } = useAuth();
   useEffect(() => {
     if (showFollowers) {
       document.body.style.overflow = "hidden";
@@ -13,16 +11,17 @@ const ViewFollowers = ({ slug }) => {
       document.body.style.overflow = "visible";
     }
   }, [showFollowers]);
-  if (!user) return;
   return (
     <div>
       <div
         // to={`/followers`}
         onClick={() => setShowFollowers(true)}
-        className="cursor-pointer flex items-center gap-x-2"
+        className="flex items-center cursor-pointer gap-x-2"
       >
-        <p className="font-[600]">{`${user.followers?.length || 0}`}</p>
-        <p>followers</p>
+        <p className="font-[600]">{`${
+          follower ? user.followers.length : user.followings.length
+        } `}</p>
+        <p>{follower ? "followers" : "followings"}</p>
       </div>
 
       {showFollowers && (
@@ -31,7 +30,8 @@ const ViewFollowers = ({ slug }) => {
           onClose={() => setShowFollowers(false)}
         >
           <FollowerModalContent
-            slug={slug}
+            follower={follower}
+            user={user}
             onClose={() => setShowFollowers(false)}
           ></FollowerModalContent>
         </ModalBase>

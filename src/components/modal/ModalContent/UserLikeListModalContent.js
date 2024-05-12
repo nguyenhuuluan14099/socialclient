@@ -12,7 +12,7 @@ const UserLikeListModalContent = ({ onClose = () => {}, listUserLike }) => {
           <IconClose></IconClose>
         </p>
       </div>
-      <div className="p-2 px-8">
+      <div className="p-2 px-2">
         {listUserLike.length > 0 &&
           listUserLike.map((item) => (
             <div key={item._id} className="my-2">

@@ -9,7 +9,7 @@ import { ToastContainer } from "react-toastify";
 import DataProvider from "components/redux/store";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
-axios.defaults.baseURL = "https://server02.vercel.app";
+axios.defaults.baseURL = "https://serversocialapp-jdv6.onrender.com/";
 root.render(
   <DataProvider>
     <BrowserRouter>

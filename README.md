@@ -62,5 +62,5 @@
   - Follow from other users (sound)
   - Other users interactive (like, comment, reply comment) to your post
 - Link Deploy:
-  https://socialclient.vercel.app/
+
 - ...

@@ -5,6 +5,7 @@ const URL =
   process.env.NODE_ENV === "production"
     ? undefined
     : "https://endsocketne1.onrender.com/";
-export const socket = io(URL, {
+const url = `https://endsocketne1.onrender.com`;
+export const socket = io(url, {
   autoConnect: false,
 });

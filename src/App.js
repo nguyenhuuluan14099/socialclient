@@ -53,10 +53,6 @@ function App() {
     };
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   if (auth?._id) dispatch(getPosts({ id: auth?._id }));
-  // }, [dispatch, auth?._id]);
-
   useEffect(() => {
     if (auth.token) {
       dispatch(getNotifies(auth.token));

@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 const URL =
   process.env.NODE_ENV === "production"
     ? undefined
-    : "https://endsocketne.vercel.app/";
+    : "https://endsocketne.vercel.app";
 export const socket = io(URL, {
   autoConnect: false,
 });

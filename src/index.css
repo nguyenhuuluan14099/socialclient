@@ -497,6 +497,6 @@ tr:nth-child(even) {
 }
 
 /* accordion */
-.szh-accordion__item-btn {
+h3.szh-accordion__item-heading button.szh-accordion__item-btn {
   width: 100%;
 }

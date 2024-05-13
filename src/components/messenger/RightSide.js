@@ -106,7 +106,7 @@ const RightSide = ({ mobileShow, setMobileShow = () => {} }) => {
           : "hidden laptop:block"
       } laptop:flex-4 h-[500px]  laptop:h-[700px] w-full  border-transparent border  dark:border-[#262626]  border-x-slate-300 `}
     >
-      <div className="-mt-[336px] dark:bg-black z-50 laptop:mt-0 h-[570px] laptop:h-[700px] flex flex-col w-full ">
+      <div className=" dark:bg-black z-50 laptop:mt-0 h-[570px] laptop:h-[700px] flex flex-col w-full ">
         <div className=" w-full    laptop:h-full overflow-y-scroll relative">
           {user.length > 0 && (
             <div className="border border-transparent w-full  flex items-center justify-between border-b-slate-300 dark:border-[#262626] py-5 px-3 sticky z-10 bg-white dark:bg-black dark:text-white top-0 left-0">

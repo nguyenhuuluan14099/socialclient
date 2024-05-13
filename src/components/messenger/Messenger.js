@@ -7,7 +7,10 @@ const Messenger = () => {
   return (
     <div className="w-full  mx-auto   border border-slate-300 dark:bg-black dark:border-[#262626] rounded-lg   h-[700px]">
       <div className="flex flex-col h-[700px]  laptop:flex-row ">
-        <LeftSide setMobileShow={setMobileShow}></LeftSide>
+        <LeftSide
+          mobileShow={mobileShow}
+          setMobileShow={setMobileShow}
+        ></LeftSide>
 
         <RightSide
           setMobileShow={setMobileShow}

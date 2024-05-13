@@ -164,7 +164,7 @@ const ShareModalContent = ({ onClose = () => {} }) => {
           )}
         </div>
         <div className="flex flex-1 laptop:h-full laptop:max-h-[450px] flex-col laptop:flex-row top-0  w-full  ">
-          <div className=" flex items-center justify-center w-full laptop:max-w-[80%] h-full overflow-hidden">
+          <div className="h-[400px] flex items-center justify-center w-full laptop:max-w-[80%] laptop:h-full overflow-hidden">
             {imageReview.length > 0 ? (
               <>
                 <Swiper
@@ -181,7 +181,7 @@ const ShareModalContent = ({ onClose = () => {} }) => {
                       <ImageLazy
                         width="100%"
                         height="100%"
-                        className="object-cover w-full h-full"
+                        className="object-cover w-full h-[400px]"
                         url={i}
                       ></ImageLazy>
                     </SwiperSlide>
@@ -217,8 +217,8 @@ const ShareModalContent = ({ onClose = () => {} }) => {
           <div className="  h-[400px] max-h-full overflow-x-hidden overflow-y-scroll flex flex-col justify-between gap-y-2   w-full laptop:max-w-[350px]">
             <div className="p-4 h-[155px] laptop:h-[200px] shrink-0 flex flex-col gap-y-3 ">
               <div className="flex items-center gap-x-2">
-                <ImageLazy
-                  url={
+                <img
+                  src={
                     auth.user.profilePicture[0].imageThumb ||
                     "https://i.ibb.co/1dSwFqY/download-1.png"
                   }
@@ -240,6 +240,7 @@ const ShareModalContent = ({ onClose = () => {} }) => {
             <div className="flex items-center justify-between">
               <Icons
                 className="px-3"
+                position="left-0"
                 content={content}
                 setContent={setContent}
               ></Icons>
@@ -254,7 +255,7 @@ const ShareModalContent = ({ onClose = () => {} }) => {
                 <p> /200</p>
               </div>
             </div>
-            <div className="flex flex-col w-full mt-auto ">
+            <div className="flex flex-col w-full  ">
               <div className="flex items-center justify-between p-1 border border-b-transparent dark:border-[#262626]">
                 <Input
                   control={control}

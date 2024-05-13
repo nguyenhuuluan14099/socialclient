@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { getDataApi } from "utils/fetchData";
 import { v4 } from "uuid";
 
-const LeftSide = ({ setMobileShow = () => {} }) => {
+const LeftSide = ({ setMobileShow = () => {}, mobileShow }) => {
   const [value, setValue] = useState("");
   const [users, setUsers] = useState([]);
   const { auth, message, online } = useSelector((state) => state);
@@ -46,7 +46,9 @@ const LeftSide = ({ setMobileShow = () => {} }) => {
     }
   }, [message.firstLoad, online, dispatch]);
   return (
-    <div className="laptop:flex-2 h-[700px]">
+    <div
+      className={`${mobileShow ? "hidden" : "flex-2"} laptop:flex-2 h-[700px]`}
+    >
       <div
         className={`border border-transparent flex items-center justify-between border-b-slate-300 dark:border-[#262626] py-5 px-3 sticky z-30`}
       >

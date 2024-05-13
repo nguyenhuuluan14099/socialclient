@@ -29,7 +29,7 @@ const PostModalContent = ({ onClose = () => {}, ...rest }) => {
   //   }
   // }, [showModalEdit]);
   return (
-    <div className="text-center cursor-pointer ">
+    <div className="text-center cursor-pointer w-full laptop:w-full">
       {userId === currentUserId ? (
         <>
           <div

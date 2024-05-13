@@ -125,6 +125,7 @@ const ShareModalContent = ({ onClose = () => {} }) => {
   const header = (
     <div
       onClick={handleClick}
+      style={{ width: "400px" }}
       className="flex items-center laptop:w-[335px] justify-between w-full px-4 py-2 "
     >
       <p>Advanced settings</p>
@@ -288,10 +289,10 @@ const ShareModalContent = ({ onClose = () => {} }) => {
               </div>
               <div className="mb-10">
                 <div>
-                  <Accordion className="w-full max-w-[400px]">
+                  <Accordion className="w-full ">
                     <AccordionItem
                       header={header}
-                      className="w-full cursor-pointer max-w-[400px]  border dark:border-[#262626]"
+                      className="w-full cursor-pointer   border dark:border-[#262626]"
                     >
                       <div className="flex flex-col justify-around">
                         <div className="flex flex-col p-4 gap-y-2">

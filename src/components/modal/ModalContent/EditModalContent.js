@@ -94,7 +94,7 @@ const EditModalContent = ({
   const header = (
     <div
       style={{
-        width: "335px",
+        width: "368px",
       }}
       onClick={handleClick}
       className="flex items-center justify-between w-full px-4 py-2 "
@@ -141,8 +141,11 @@ const EditModalContent = ({
     <>
       <div className="flex flex-col w-full dark:bg-black">
         <form onSubmit={handleSubmit(handleUpdatePost)}>
-          <div className="flex items-center justify-between p-3 border border-transparent border-b-slate-300">
-            <p onClick={onClose} className="cursor-pointer xl:hidden ">
+          <div className="flex items-center justify-between p-3 border border-transparent border-b-slate-300 ">
+            <p
+              onClick={onClose}
+              className="cursor-pointer block laptop:hidden "
+            >
               <IconBack></IconBack>
             </p>
             <p className="text-lg font-semibold mx-auto">Update post</p>
@@ -162,7 +165,7 @@ const EditModalContent = ({
               </>
             )}
           </div>
-          <div className="flex items-center  flex-col xl:flex-row h-[750px] xl:h-[450px]">
+          <div className="flex items-center  flex-col laptop:flex-row  laptop:h-[450px]">
             <div className="flex items-center justify-center w-full max-w-[80%] h-full overflow-hidden">
               {/* <Carousel imageList={post.img}></Carousel> */}
               {post.length > 0 && (
@@ -182,7 +185,7 @@ const EditModalContent = ({
                         <ImageLazy
                           width="100%"
                           height="100%"
-                          className="w-full h-full object-cover relative"
+                          className="w-full h-[400px] object-cover relative"
                           url={i}
                         ></ImageLazy>
                         {images.length > 1 && (
@@ -202,8 +205,8 @@ const EditModalContent = ({
             <div className=" h-[490px] max-h-full  overflow-y-auto flex flex-col justify-between gap-y-2   w-full max-w-[365px]">
               <div className="p-4 h-[180px] xl:h-[300px] overflow-y-auto shrink-0 flex flex-col gap-y-3">
                 <div className="flex items-center gap-x-2">
-                  <ImageLazy
-                    url={
+                  <img
+                    src={
                       auth.user.profilePicture[0].imageThumb ||
                       "https://i.ibb.co/1dSwFqY/download-1.png"
                     }
@@ -228,6 +231,7 @@ const EditModalContent = ({
                   className="px-3"
                   content={content}
                   setContent={setContent}
+                  position="left-0"
                 ></Icons>
                 <div className="flex px-3 text-[12px]">
                   <p>
@@ -242,18 +246,10 @@ const EditModalContent = ({
               </div>
               <div className="w-full  flex flex-col  mb-[100px] ">
                 <div className="flex items-center justify-between p-2 px-3 border border-b-transparent border-slate-300">
-                  {/* <Input
-                    control={control}
-                    name="location"
-                    type="text"
-                    className="p-2 border-none outline-none dark:bg-black"
-                    placeholder="Add location"
-                  /> */}
                   <input
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    // {...register("location")}
                     className="p-2 border-none outline-none dark:bg-black"
                     placeholder="Add location"
                   />
@@ -280,12 +276,12 @@ const EditModalContent = ({
                   </p>
                 </div>
 
-                <div className="mb-10">
+                <div className="">
                   <div>
-                    <Accordion className="w-full max-w-[400px]">
+                    <Accordion className="w-full ">
                       <AccordionItem
                         header={header}
-                        className="w-full cursor-pointer max-w-[400px]  border border-slate-300"
+                        className="w-full cursor-pointer    border border-slate-300"
                       >
                         <div className="flex flex-col justify-around">
                           <div className="flex flex-col p-4 gap-y-2">

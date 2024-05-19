@@ -114,8 +114,8 @@ const RightSide = ({ mobileShow, setMobileShow = () => {} }) => {
                 <>
                   <span
                     onClick={() => setMobileShow(false)}
-                    className={`mr-3 cursor-pointer laptop:hidden ${
-                      mobileShow ? "block" : "hidden"
+                    className={`mr-3 cursor-pointer laptop:hidden  ${
+                      mobileShow ? "block " : "hidden "
                     } `}
                   >
                     <IconBack></IconBack>

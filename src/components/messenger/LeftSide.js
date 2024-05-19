@@ -47,7 +47,9 @@ const LeftSide = ({ setMobileShow = () => {}, mobileShow }) => {
   }, [message.firstLoad, online, dispatch]);
   return (
     <div
-      className={`${mobileShow ? "hidden" : "flex-2"} laptop:flex-2 h-[700px]`}
+      className={`${
+        mobileShow ? "hidden laptop:block" : "flex-2"
+      } laptop:flex-2  h-[700px]`}
     >
       <div
         className={`border border-transparent flex items-center justify-between border-b-slate-300 dark:border-[#262626] py-5 px-3 sticky z-30`}
